@@ -43,11 +43,11 @@ function Dashboard() {
       </Typography>
       <Grid container spacing={3} alignItems="stretch">
         {features.map((feature) => (
-          <Grid item xs={12} sm={6} md={3} key={feature.name}>
+          <Grid item xs={12} sm={12} md={6} key={feature.name}>
             <Card
               sx={{
-                height: 200, // 固定の高さを設定
-                width: "100%", // 幅を100%に固定
+                height: 150, // 高さを調整
+                width: "100%",
                 display: "flex",
                 flexDirection: "column",
               }}
@@ -56,30 +56,28 @@ function Dashboard() {
                 component={Link}
                 to={feature.path}
                 sx={{
-                  height: "100%", // カード全体の高さに合わせる
+                  height: "100%",
                   display: "flex",
-                  flexDirection: "column",
+                  flexDirection: "row", // アイコンとテキストを横並びにする
+                  alignItems: "center", // 垂直方向中央揃え
+                  p: 2, // パディングを調整
                 }}
               >
+                <Box sx={{ mr: 2 }}>{feature.icon}</Box> {/* アイコンを左に寄せる */}
                 <CardContent
                   sx={{
-                    height: "100%", // CardActionAreaの高さに合わせる
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    p: 3,
-                    textAlign: "center", // テキストを中央揃え
+                    flexGrow: 1, // 残りのスペースを埋める
+                    p: 0, // CardContentのデフォルトパディングをリセット
+                    "&:last-child": { pb: 0 }, // 最後の要素のパディングもリセット
                   }}
                 >
-                  {feature.icon}
                   <Typography 
                     variant="h6" 
                     component="div" 
                     sx={{ 
-                      mt: 1,
-                      mb: 1,
-                      minHeight: "1.5em", // タイトルの最小高さを設定
+                      mb: 0.5, // タイトルと説明の間のスペース
+                      whiteSpace: 'normal',
+                      wordBreak: 'break-word',
                     }}
                   >
                     {feature.name}
@@ -88,12 +86,13 @@ function Dashboard() {
                     variant="body2"
                     color="text.secondary"
                     sx={{ 
-                      textAlign: "center",
                       lineHeight: 1.4,
-                      overflow: "hidden", // テキストがはみ出た場合の対処
+                      overflow: "hidden",
                       display: "-webkit-box",
-                      WebkitLineClamp: 3, // 最大3行まで表示
+                      WebkitLineClamp: 2, // 最大2行まで表示
                       WebkitBoxOrient: "vertical",
+                      whiteSpace: 'normal',
+                      wordBreak: 'break-word',
                     }}
                   >
                     {feature.description}

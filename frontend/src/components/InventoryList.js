@@ -68,16 +68,16 @@ function InventoryList() {
       ) : isMobile ? ( // モバイル表示の場合
         <Grid container spacing={2}>
           {inventory.map((item, index) => (
-            <Grid item xs={12} sm={6} key={index}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" component="div">
+            <Grid item xs={12} sm={12} key={index}>
+              <Card sx={{ width: "100%", height: 150, display: "flex", flexDirection: "column" }}>
+                <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                  <Typography variant="h6" component="div" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
                     {item['商品名']}
                   </Typography>
-                  <Typography color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
                     管理No.: {item['管理No.']}
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body2" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
                     在庫: {item['在庫']}
                   </Typography>
                 </CardContent>

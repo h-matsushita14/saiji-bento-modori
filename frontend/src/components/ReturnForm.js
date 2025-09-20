@@ -298,53 +298,53 @@ function ReturnForm() {
             {products.flatMap(product => {
               const rows = productFormValues[product.id] || [];
               return rows.map((row, index) => (
-                <Grid item xs={12} key={`${product.id}-${row.id}`}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" component="div">
+                <Grid item xs={12} sm={12} key={`${product.id}-${row.id}`}>
+                  <Card sx={{ width: "100%", height: 200, display: "flex", flexDirection: "column" }}>
+                    <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                      <Typography variant="h6" component="div" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
                         {product['商品名']}
                       </Typography>
                       {product['重さ入力'] === '有' && (
-                        <Grid container spacing={1} alignItems="center" sx={{ mt: 1 }}>
-                          <Grid item xs={5}>
-                            {/* 整数部のドロップダウン */}
-                            <FormControl fullWidth size="small" disabled={loading}>
-                              <InputLabel>重さ (整数)</InputLabel>
-                              <Select
-                                value={row.重さ整数 || ''}
-                                onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
-                              >
-                                {Array.from({ length: 10 }, (_, i) => (
-                                  <MenuItem key={i} value={i}>
-                                    {i}
-                                  </MenuItem>
-                                ))}
-                              </Select>
-                            </FormControl>
+                        <Box sx={{ mt: 1, mb: 1, width: '100%' }}>
+                          <Grid container spacing={1} alignItems="center">
+                            <Grid item xs={5}>
+                              <FormControl fullWidth size="small" disabled={loading}>
+                                <InputLabel>重さ (整数)</InputLabel>
+                                <Select
+                                  value={row.重さ整数 || ''}
+                                  onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
+                                >
+                                  {Array.from({ length: 10 }, (_, i) => (
+                                    <MenuItem key={i} value={i}>
+                                      {i}
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={1} sx={{ textAlign: 'center' }}>
+                              <Typography variant="body1">.</Typography>
+                            </Grid>
+                            <Grid item xs={5}>
+                              <FormControl fullWidth size="small" disabled={loading}>
+                                <InputLabel>小数</InputLabel>
+                                <Select
+                                  value={row.重さ小数 || ''}
+                                  onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
+                                >
+                                  {Array.from({ length: 10 }, (_, i) => (
+                                    <MenuItem key={i} value={i}>
+                                      {i}
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={1}>
+                              <Typography variant="body1">kg</Typography>
+                            </Grid>
                           </Grid>
-                          <Grid item xs={1} sx={{ textAlign: 'center' }}>
-                            <Typography variant="body1">.</Typography>
-                          </Grid>
-                          <Grid item xs={5}>
-                            {/* 小数部のドロップダウン */}
-                            <FormControl fullWidth size="small" disabled={loading}>
-                              <InputLabel>小数</InputLabel>
-                              <Select
-                                value={row.重さ小数 || ''}
-                                onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
-                              >
-                                {Array.from({ length: 10 }, (_, i) => (
-                                  <MenuItem key={i} value={i}>
-                                    {i}
-                                  </MenuItem>
-                                ))}
-                              </Select>
-                            </FormControl>
-                          </Grid>
-                          <Grid item xs={1}>
-                            <Typography variant="body1">kg</Typography>
-                          </Grid>
-                        </Grid>
+                        </Box>
                       )}
                       <FormControl fullWidth size="small" sx={{ mt: 1 }} disabled={loading}>
                         <InputLabel>数量</InputLabel>
@@ -360,10 +360,10 @@ function ReturnForm() {
                           ))}
                         </Select>
                       </FormControl>
-                      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 1, whiteSpace: 'normal', wordBreak: 'break-word' }}>
                         単位: {product['単位']}
                       </Typography>
-                      <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '100%' }}>
                         <IconButton
                           onClick={() => handleAddRow(product.id)}
                           disabled={loading}
