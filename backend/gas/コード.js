@@ -80,9 +80,11 @@ function doGet(e) {
 function doPost(e) {
   let response;
   try {
-    const type = e.parameter.type;
-    const action = e.parameter.action;
-    const data = JSON.parse(e.parameter.data);
+    // JSON形式のリクエストボディをパース
+    const requestData = JSON.parse(e.postData.contents);
+    const type = requestData.type;
+    const action = requestData.action;
+    const data = requestData.data;
 
     let message = '';
 
