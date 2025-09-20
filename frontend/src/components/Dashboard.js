@@ -41,12 +41,12 @@ function Dashboard() {
       <Typography variant="h4" component="h1" gutterBottom>
         機能一覧
       </Typography>
-      <Grid container spacing={3} alignItems="stretch">
+      <Grid container spacing={3} alignItems="stretch" sx={{ display: { xs: 'flex', md: 'none' } }}>
         {features.map((feature) => (
-          <Grid item xs={12} sm={12} md={6} key={feature.name}>
+          <Grid item xs={12} key={feature.name}>
             <Card
               sx={{
-                height: 150, // 高さを調整
+                height: '100%', // 高さを揃える
                 width: "100%",
                 display: "flex",
                 flexDirection: "column",
@@ -89,7 +89,7 @@ function Dashboard() {
                       lineHeight: 1.4,
                       overflow: "hidden",
                       display: "-webkit-box",
-                      WebkitLineClamp: 2, // 最大2行まで表示
+                      WebkitLineClamp: 1, // 最大1行まで表示
                       WebkitBoxOrient: "vertical",
                       whiteSpace: 'normal',
                       wordBreak: 'break-word',
