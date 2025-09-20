@@ -39,7 +39,7 @@ function Dashboard() {
   return (
     <Box sx={{ flexGrow: 1, mt: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        ダッシュボード
+        機能一覧
       </Typography>
       <Grid container spacing={3} alignItems="stretch">
         {features.map((feature) => (
