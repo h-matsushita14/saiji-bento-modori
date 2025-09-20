@@ -43,7 +43,7 @@ function Dashboard() {
       </Typography>
       <Grid container spacing={3} alignItems="stretch">
         {features.map((feature) => (
-          <Grid item xs={12} sm={6} md={4} key={feature.name}>
+          <Grid item xs={12} sm={6} md={3} key={feature.name}>
             <Card
               sx={{
                 height: "100%", // Gridの高さに合わせる
