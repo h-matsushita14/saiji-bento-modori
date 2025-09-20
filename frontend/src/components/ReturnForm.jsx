@@ -294,106 +294,112 @@ function ReturnForm() {
         ) : products.length === 0 ? (
           <Alert severity="info">登録されている商品がありません。取扱商品ページから商品を登録してください。</Alert>
         ) : isMobile ? ( // モバイル表示の場合
-          <Grid container spacing={2}>
-            {products.flatMap(product => {
-              const rows = productFormValues[product.id] || [];
-              return rows.map((row, index) => (
-                <Grid item xs={12} sm={12} key={`${product.id}-${row.id}`}>
-                  <Card sx={{ width: "100%", height: 200, display: "flex", flexDirection: "column" }}>
-                    <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-                      <Typography variant="h6" component="div" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                        {product['商品名']}
-                      </Typography>
-                      {product['重さ入力'] === '有' && (
-                        <Box sx={{ mt: 1, mb: 1, width: '100%' }}>
-                          <Grid container spacing={1} alignItems="center">
-                            <Grid item xs={5}>
-                              <FormControl fullWidth size="small" disabled={loading}>
-                                {/* <InputLabel>重さ (整数)</InputLabel> Removed as per user request */}
-                                <Select
-                                  value={row.重さ整数 || ''}
-                                  onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
-                                  displayEmpty // Add displayEmpty prop
+          <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+            <Table aria-label="商品戻り記録テーブル">
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 'bold' }}>商品</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {products.flatMap(product => {
+                  const rows = productFormValues[product.id] || [];
+                  return rows.map((row, index) => (
+                    <TableRow key={`${product.id}-${row.id}`}>
+                      <TableCell>
+                        <Card sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
+                          <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                            <Typography variant="h6" component="div" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                              {product['商品名']}
+                            </Typography>
+                            {product['重さ入力'] === '有' && (
+                              <Box sx={{ mt: 1, mb: 1, width: '100%' }}>
+                                <Grid container spacing={1} alignItems="center">
+                                  <Grid item xs={5}>
+                                    <FormControl fullWidth size="small" disabled={loading}>
+                                      <Select
+                                        value={row.重さ整数 || ''}
+                                        onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
+                                        displayEmpty
+                                      >
+                                        {Array.from({ length: 10 }, (_, i) => (
+                                          <MenuItem key={i} value={i}>
+                                            {i}
+                                          </MenuItem>
+                                        ))}
+                                      </Select>
+                                    </FormControl>
+                                  </Grid>
+                                  <Grid item xs={1} sx={{ textAlign: 'center' }}>
+                                    <Typography variant="body1">.</Typography>
+                                  </Grid>
+                                  <Grid item xs={5}>
+                                    <FormControl fullWidth size="small" disabled={loading}>
+                                      <Select
+                                        value={row.重さ小数 || ''}
+                                        onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
+                                        displayEmpty
+                                      >
+                                        {Array.from({ length: 10 }, (_, i) => (
+                                          <MenuItem key={i} value={i}>
+                                            {i}
+                                          </MenuItem>
+                                        ))}
+                                      </Select>
+                                    </FormControl>
+                                  </Grid>
+                                  <Grid item xs={1}>
+                                    <Typography variant="body1">kg</Typography>
+                                  </Grid>
+                                </Grid>
+                              </Box>
+                            )}
+                            <FormControl fullWidth size="small" sx={{ mt: 1 }} disabled={loading}>
+                              <InputLabel id="quantity-label-mobile">数量</InputLabel>
+                              <Select
+                                value={row.数量 || ''}
+                                labelId="quantity-label-mobile"
+                                label="数量"
+                                onChange={(e) => handleProductValueChange(product.id, row.id, '数量', e.target.value)}
+                              >
+                                {Array.from({ length: 101 }, (_, i) => (
+                                  <MenuItem key={i} value={i}>
+                                    {i}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                            <Typography variant="body2" color="text.secondary" sx={{ mt: 1, whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                              単位: {product['単位']}
+                            </Typography>
+                            <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '100%' }}>
+                              <IconButton
+                                onClick={() => handleAddRow(product.id)}
+                                disabled={loading}
+                                size="small"
+                              >
+                                <AddCircleOutlineIcon />
+                              </IconButton>
+                              <Typography variant="body2" sx={{ mr: 1 }}>他の重さを追加</Typography>
+                              {rows.length > 1 && (
+                                <IconButton
+                                  onClick={() => handleRemoveRow(product.id, row.id)}
+                                  disabled={loading}
+                                  size="small"
                                 >
-                                  
-                                  {Array.from({ length: 10 }, (_, i) => (
-                                    <MenuItem key={i} value={i}>
-                                      {i}
-                                    </MenuItem>
-                                  ))}
-                                </Select>
-                              </FormControl>
-                            </Grid>
-                            <Grid item xs={1} sx={{ textAlign: 'center' }}>
-                              <Typography variant="body1">.</Typography>
-                            </Grid>
-                            <Grid item xs={5}>
-                              <FormControl fullWidth size="small" disabled={loading}>
-                                {/* <InputLabel>小数</InputLabel> Removed as per user request */}
-                                <Select
-                                  value={row.重さ小数 || ''}
-                                  onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
-                                  displayEmpty // Add displayEmpty prop
-                                >
-                                  
-                                  {Array.from({ length: 10 }, (_, i) => (
-                                    <MenuItem key={i} value={i}>
-                                      {i}
-                                    </MenuItem>
-                                  ))}
-                                </Select>
-                              </FormControl>
-                            </Grid>
-                            <Grid item xs={1}>
-                              <Typography variant="body1">kg</Typography>
-                            </Grid>
-                          </Grid>
-                        </Box>
-                      )}
-                      <FormControl fullWidth size="small" sx={{ mt: 1 }} disabled={loading}>
-                        {/* <InputLabel>数量</InputLabel> Removed, relying on Select's label prop */}
-                        <InputLabel id="quantity-label-mobile">数量</InputLabel>
-                        <Select
-                          value={row.数量 || ''}
-                          labelId="quantity-label-mobile"
-                          label="数量"
-                          onChange={(e) => handleProductValueChange(product.id, row.id, '数量', e.target.value)}
-                        >
-                          {Array.from({ length: 101 }, (_, i) => (
-                            <MenuItem key={i} value={i}>
-                              {i}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                      <Typography variant="body2" color="text.secondary" sx={{ mt: 1, whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                        単位: {product['単位']}
-                      </Typography>
-                      <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '100%' }}>
-                        <IconButton
-                          onClick={() => handleAddRow(product.id)}
-                          disabled={loading}
-                          size="small"
-                        >
-                          <AddCircleOutlineIcon />
-                        </IconButton>
-                        <Typography variant="body2" sx={{ mr: 1 }}>他の重さを追加</Typography>
-                        {rows.length > 1 && (
-                          <IconButton
-                            onClick={() => handleRemoveRow(product.id, row.id)}
-                            disabled={loading}
-                            size="small"
-                          >
-                            <RemoveCircleOutlineIcon />
-                          </IconButton>
-                        )}
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ));
-            })}
-          </Grid>
+                                  <RemoveCircleOutlineIcon />
+                                </IconButton>
+                              )}
+                            </Box>
+                          </CardContent>
+                        </Card>
+                      </TableCell>
+                    </TableRow>
+                  ));
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
         ) : ( // PC表示の場合
           <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
             <Table aria-label="商品戻り記録テーブル">
