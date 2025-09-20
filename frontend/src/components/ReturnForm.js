@@ -307,31 +307,41 @@ function ReturnForm() {
                       {product['重さ入力'] === '有' && (
                         <Grid container spacing={1} alignItems="center" sx={{ mt: 1 }}>
                           <Grid item xs={5}>
-                            <TextField
-                              label="重さ (整数)"
-                              size="small"
-                              type="number"
-                              value={row.重さ整数 || ''}
-                              onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
-                              inputProps={{ min: 0 }}
-                              disabled={loading}
-                              fullWidth
-                            />
+                            {/* 整数部のドロップダウン */}
+                            <FormControl fullWidth size="small" disabled={loading}>
+                              <InputLabel>重さ (整数)</InputLabel>
+                              <Select
+                                value={row.重さ整数 || ''}
+                                label="重さ (整数)"
+                                onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
+                              >
+                                {Array.from({ length: 10 }, (_, i) => (
+                                  <MenuItem key={i} value={i}>
+                                    {i}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
                           </Grid>
                           <Grid item xs={1} sx={{ textAlign: 'center' }}>
                             <Typography variant="body1">.</Typography>
                           </Grid>
                           <Grid item xs={5}>
-                            <TextField
-                              label="小数"
-                              size="small"
-                              type="number"
-                              value={row.重さ小数 || ''}
-                              onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
-                              inputProps={{ min: 0, max: 99 }}
-                              disabled={loading}
-                              fullWidth
-                            />
+                            {/* 小数部のドロップダウン */}
+                            <FormControl fullWidth size="small" disabled={loading}>
+                              <InputLabel>小数</InputLabel>
+                              <Select
+                                value={row.重さ小数 || ''}
+                                label="小数"
+                                onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
+                              >
+                                {Array.from({ length: 10 }, (_, i) => (
+                                  <MenuItem key={i} value={i}>
+                                    {i}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
                           </Grid>
                           <Grid item xs={1}>
                             <Typography variant="body1">kg</Typography>
@@ -405,25 +415,37 @@ function ReturnForm() {
                       <TableCell>
                         {product['重さ入力'] === '有' ? (
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <TextField
-                              size="small"
-                              type="number"
-                              value={row.重さ整数 || ''}
-                              onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
-                              inputProps={{ min: 0 }}
-                              disabled={loading}
-                              sx={{ width: 60 }}
-                            />
+                            {/* 整数部のドロップダウン */}
+                            <FormControl size="small" sx={{ width: 60 }} disabled={loading}>
+                              <InputLabel>整数</InputLabel>
+                              <Select
+                                value={row.重さ整数 || ''}
+                                label="整数"
+                                onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
+                              >
+                                {Array.from({ length: 10 }, (_, i) => (
+                                  <MenuItem key={i} value={i}>
+                                    {i}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
                             <Typography variant="body1">.</Typography>
-                            <TextField
-                              size="small"
-                              type="number"
-                              value={row.重さ小数 || ''}
-                              onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
-                              inputProps={{ min: 0, max: 99 }}
-                              disabled={loading}
-                              sx={{ width: 40 }}
-                            />
+                            {/* 小数部のドロップダウン */}
+                            <FormControl size="small" sx={{ width: 40 }} disabled={loading}>
+                              <InputLabel>小数</InputLabel>
+                              <Select
+                                value={row.重さ小数 || ''}
+                                label="小数"
+                                onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
+                              >
+                                {Array.from({ length: 10 }, (_, i) => (
+                                  <MenuItem key={i} value={i}>
+                                    {i}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
                             <Typography variant="body1">kg</Typography>
                           </Box>
                         ) : (
