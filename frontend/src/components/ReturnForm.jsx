@@ -85,7 +85,7 @@ function ReturnForm() {
         // 各商品のフォーム値を初期化
         const initialProductValues = {};
         data.forEach(product => {
-          initialProductValues[product.id] = [{ id: 1, 数量: '', 重さ整数: '', 重さ小数: '' }];
+          initialProductValues[product.id] = [{ id: 1, 数量: '', 重さ整数: '0', 重さ小数: '0' }];
         });
         setProductFormValues(initialProductValues);
       } catch (err) {
@@ -315,7 +315,7 @@ function ReturnForm() {
                                   onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
                                   displayEmpty // Add displayEmpty prop
                                 >
-                                  <MenuItem value="" disabled>整数</MenuItem> {/* Placeholder */}
+                                  
                                   {Array.from({ length: 10 }, (_, i) => (
                                     <MenuItem key={i} value={i}>
                                       {i}
@@ -335,7 +335,7 @@ function ReturnForm() {
                                   onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
                                   displayEmpty // Add displayEmpty prop
                                 >
-                                  <MenuItem value="" disabled>小数</MenuItem> {/* Placeholder */}
+                                  
                                   {Array.from({ length: 10 }, (_, i) => (
                                     <MenuItem key={i} value={i}>
                                       {i}
@@ -352,8 +352,10 @@ function ReturnForm() {
                       )}
                       <FormControl fullWidth size="small" sx={{ mt: 1 }} disabled={loading}>
                         {/* <InputLabel>数量</InputLabel> Removed, relying on Select's label prop */}
+                        <InputLabel id="quantity-label-mobile">数量</InputLabel>
                         <Select
                           value={row.数量 || ''}
+                          labelId="quantity-label-mobile"
                           label="数量"
                           onChange={(e) => handleProductValueChange(product.id, row.id, '数量', e.target.value)}
                         >
@@ -425,7 +427,7 @@ function ReturnForm() {
                                 onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
                                 displayEmpty // Add displayEmpty prop
                               >
-                                <MenuItem value="" disabled>整数</MenuItem> {/* Placeholder */}
+                                
                                 {Array.from({ length: 10 }, (_, i) => (
                                   <MenuItem key={i} value={i}>
                                     {i}
@@ -442,7 +444,7 @@ function ReturnForm() {
                                 onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
                                 displayEmpty // Add displayEmpty prop
                               >
-                                <MenuItem value="" disabled>小数</MenuItem> {/* Placeholder */}
+                                
                                 {Array.from({ length: 10 }, (_, i) => (
                                   <MenuItem key={i} value={i}>
                                     {i}
@@ -458,8 +460,11 @@ function ReturnForm() {
                       </TableCell>
                       <TableCell>
                         <FormControl size="small" sx={{ width: 100 }} disabled={loading}>
+                          <InputLabel id="quantity-label-pc">数量</InputLabel>
                           <Select
                             value={row.数量 || ''}
+                            labelId="quantity-label-pc"
+                            label="数量"
                             onChange={(e) => handleProductValueChange(product.id, row.id, '数量', e.target.value)}
                             displayEmpty
                           >
