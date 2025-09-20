@@ -88,7 +88,7 @@ function ReturnForm() {
       }
     };
     loadProducts();
-  }, []);
+  }, [setErrors]);
 
   // 各商品の数量・重さ変更時のハンドラ
   const handleProductValueChange = (productId, rowId, field, value) => {
