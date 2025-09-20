@@ -437,7 +437,7 @@ function ReturnForm() {
                             </FormControl>
                             <Typography variant="body1">.</Typography>
                             {/* 小数部のドロップダウン */}
-                            <FormControl size="small" sx={{ width: 40 }} disabled={loading}>
+                            <FormControl size="small" sx={{ width: 60 }} disabled={loading}>
                               {/* <InputLabel>小数</InputLabel> Removed as per user request */}
                               <Select
                                 value={row.重さ小数 || ''}
