@@ -25,18 +25,18 @@ import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import useMediaQuery from '@mui/material/useMediaQuery'; // 追加
-import { useTheme } from '@mui/material/styles'; // 追加
-import Card from '@mui/material/Card'; // 追加
-import CardContent from '@mui/material/CardContent'; // 追加
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 
 function ReturnForm() {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]); // 商品マスタデータ
   const [productFormValues, setProductFormValues] = useState({}); // 各商品の数量と重さ
 
-  const theme = useTheme(); // 追加
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // 追加
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // 今日の日付を取得
   const getToday = () => {
@@ -85,7 +85,7 @@ function ReturnForm() {
         // 各商品のフォーム値を初期化
         const initialProductValues = {};
         data.forEach(product => {
-          initialProductValues[product.id] = [{ id: 1, 数量: '', 重さ: '' }]; // 各商品に初期の1行を設定
+          initialProductValues[product.id] = [{ id: 1, 数量: '', 重さ整数: '', 重さ小数: '' }];
         });
         setProductFormValues(initialProductValues);
       } catch (err) {
@@ -113,7 +113,7 @@ function ReturnForm() {
       ...prev,
       [productId]: [
         ...prev[productId],
-        { id: prev[productId].length > 0 ? Math.max(...prev[productId].map(row => row.id)) + 1 : 1, 数量: '', 重さ: '' }
+        { id: prev[productId].length > 0 ? Math.max(...prev[productId].map(row => row.id)) + 1 : 1, 数量: '', 重さ整数: '', 重さ小数: '' }
       ],
     }));
   };
@@ -141,9 +141,14 @@ function ReturnForm() {
     try {
       const recordsToSubmit = [];
       products.forEach(product => {
-        (productFormValues[product.id] || []).forEach(row => { // ここを修正
+        (productFormValues[product.id] || []).forEach(row => {
           const quantity = parseInt(row.数量);
-          const weight = parseFloat(row.重さ);
+          let weight = null;
+          if (product['重さ入力'] === '有') {
+            const integerPart = parseInt(row.重さ整数) || 0;
+            const decimalPart = parseInt(row.重さ小数) || 0;
+            weight = parseFloat(`${integerPart}.${decimalPart}`);
+          }
 
           if (!isNaN(quantity) && quantity > 0) {
             const recordData = {
@@ -152,7 +157,7 @@ function ReturnForm() {
               '商品名': product['商品名'],
               '数量': quantity,
             };
-            if (product['重さ入力'] === '有' && !isNaN(weight)) {
+            if (product['重さ入力'] === '有' && weight !== null && !isNaN(weight)) {
               recordData['重さ'] = weight;
             }
             recordsToSubmit.push(recordData);
@@ -176,7 +181,7 @@ function ReturnForm() {
       // 各商品のフォーム値をリセット
       const resetProductValues = {};
       products.forEach(product => {
-        resetProductValues[product.id] = [{ id: 1, 数量: '', 重さ: '' }];
+        resetProductValues[product.id] = [{ id: 1, 数量: '', 重さ整数: '', 重さ小数: '' }];
       });
       setProductFormValues(resetProductValues);
 
@@ -189,7 +194,7 @@ function ReturnForm() {
   };
 
   return (
-    <Box sx={{ mt: 4 }}>
+    <Box sx={{ mt: 4, pb: 10 }}>
       <Typography variant="h4" component="h2" gutterBottom>
         戻り記録
       </Typography>
@@ -203,7 +208,7 @@ function ReturnForm() {
             戻り記録日
           </Typography>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={4} md={4}> {/* レスポンシブ対応 */}
+            <Grid item xs={12} sm={4} md={4}>
               <FormControl fullWidth error={!!errors.年} disabled={loading}>
                 <InputLabel>年</InputLabel>
                 <Select
@@ -224,7 +229,7 @@ function ReturnForm() {
                 {errors.年 && <FormHelperText>{errors.年}</FormHelperText>}
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={4} md={4}> {/* レスポンシブ対応 */}
+            <Grid item xs={12} sm={4} md={4}>
               <FormControl fullWidth error={!!errors.月} disabled={loading}>
                 <InputLabel>月</InputLabel>
                 <Select
@@ -242,7 +247,7 @@ function ReturnForm() {
                 {errors.月 && <FormHelperText>{errors.月}</FormHelperText>}
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={4} md={4}> {/* レスポンシブ対応 */}
+            <Grid item xs={12} sm={4} md={4}>
               <FormControl fullWidth error={!!errors.日} disabled={loading}>
                 <InputLabel>日</InputLabel>
                 <Select
@@ -300,33 +305,57 @@ function ReturnForm() {
                         {product['商品名']}
                       </Typography>
                       {product['重さ入力'] === '有' && (
-                        <TextField
-                          label="重さ (kg)"
-                          size="small"
-                          type="number"
-                          value={row.重さ || ''}
-                          onChange={(e) => handleProductValueChange(product.id, row.id, '重さ', e.target.value)}
-                          inputProps={{ min: 0, step: "0.01" }}
-                          disabled={loading}
-                          fullWidth
-                          sx={{ mt: 1 }}
-                        />
+                        <Grid container spacing={1} alignItems="center" sx={{ mt: 1 }}>
+                          <Grid item xs={5}>
+                            <TextField
+                              label="重さ (整数)"
+                              size="small"
+                              type="number"
+                              value={row.重さ整数 || ''}
+                              onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
+                              inputProps={{ min: 0 }}
+                              disabled={loading}
+                              fullWidth
+                            />
+                          </Grid>
+                          <Grid item xs={1} sx={{ textAlign: 'center' }}>
+                            <Typography variant="body1">.</Typography>
+                          </Grid>
+                          <Grid item xs={5}>
+                            <TextField
+                              label="小数"
+                              size="small"
+                              type="number"
+                              value={row.重さ小数 || ''}
+                              onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
+                              inputProps={{ min: 0, max: 99 }}
+                              disabled={loading}
+                              fullWidth
+                            />
+                          </Grid>
+                          <Grid item xs={1}>
+                            <Typography variant="body1">kg</Typography>
+                          </Grid>
+                        </Grid>
                       )}
-                      <TextField
-                        label="数量"
-                        size="small"
-                        type="number"
-                        value={row.数量 || ''}
-                        onChange={(e) => handleProductValueChange(product.id, row.id, '数量', e.target.value)}
-                        inputProps={{ min: 0 }}
-                        disabled={loading}
-                        fullWidth
-                        sx={{ mt: 1 }}
-                      />
+                      <FormControl fullWidth size="small" sx={{ mt: 1 }} disabled={loading}>
+                        <InputLabel>数量</InputLabel>
+                        <Select
+                          value={row.数量 || ''}
+                          label="数量"
+                          onChange={(e) => handleProductValueChange(product.id, row.id, '数量', e.target.value)}
+                        >
+                          {Array.from({ length: 101 }, (_, i) => (
+                            <MenuItem key={i} value={i}>
+                              {i}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                       <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                         単位: {product['単位']}
                       </Typography>
-                      <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                      <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                         <IconButton
                           onClick={() => handleAddRow(product.id)}
                           disabled={loading}
@@ -334,6 +363,7 @@ function ReturnForm() {
                         >
                           <AddCircleOutlineIcon />
                         </IconButton>
+                        <Typography variant="body2" sx={{ mr: 1 }}>他の重さを追加</Typography>
                         {rows.length > 1 && (
                           <IconButton
                             onClick={() => handleRemoveRow(product.id, row.id)}
@@ -359,7 +389,7 @@ function ReturnForm() {
                   <TableCell>重さ</TableCell>
                   <TableCell>数量</TableCell>
                   <TableCell>単位</TableCell>
-                  <TableCell></TableCell> {/* 行追加・削除ボタン用 */}
+                  <TableCell></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -374,52 +404,71 @@ function ReturnForm() {
                       )}
                       <TableCell>
                         {product['重さ入力'] === '有' ? (
-                          <TextField
-                            size="small"
-                            type="number"
-                            value={row.重さ || ''}
-                            onChange={(e) => handleProductValueChange(product.id, row.id, '重さ', e.target.value)}
-                            inputProps={{ min: 0, step: "0.01" }}
-                            helperText="kg"
-                            disabled={loading}
-                            sx={{ width: 80 }}
-                          />
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <TextField
+                              size="small"
+                              type="number"
+                              value={row.重さ整数 || ''}
+                              onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
+                              inputProps={{ min: 0 }}
+                              disabled={loading}
+                              sx={{ width: 60 }}
+                            />
+                            <Typography variant="body1">.</Typography>
+                            <TextField
+                              size="small"
+                              type="number"
+                              value={row.重さ小数 || ''}
+                              onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
+                              inputProps={{ min: 0, max: 99 }}
+                              disabled={loading}
+                              sx={{ width: 40 }}
+                            />
+                            <Typography variant="body1">kg</Typography>
+                          </Box>
                         ) : (
                           '-'
                         )}
                       </TableCell>
                       <TableCell>
-                        <TextField
-                          size="small"
-                          type="number"
-                          value={row.数量 || ''}
-                          onChange={(e) => handleProductValueChange(product.id, row.id, '数量', e.target.value)}
-                          inputProps={{ min: 0 }}
-                          disabled={loading}
-                          sx={{ width: 80 }}
-                        />
+                        <FormControl size="small" sx={{ width: 100 }} disabled={loading}>
+                          <Select
+                            value={row.数量 || ''}
+                            onChange={(e) => handleProductValueChange(product.id, row.id, '数量', e.target.value)}
+                            displayEmpty
+                          >
+                            {Array.from({ length: 101 }, (_, i) => (
+                              <MenuItem key={i} value={i}>
+                                {i}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
                       </TableCell>
                       <TableCell>
                         {product['単位']}
                       </TableCell>
                       {product['重さ入力'] === '有' && (
                         <TableCell>
-                          <IconButton
-                            onClick={() => handleAddRow(product.id)}
-                            disabled={loading}
-                            size="small"
-                          >
-                            <AddCircleOutlineIcon />
-                          </IconButton>
-                          {rows.length > 1 && (
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <IconButton
-                              onClick={() => handleRemoveRow(product.id, row.id)}
+                              onClick={() => handleAddRow(product.id)}
                               disabled={loading}
                               size="small"
                             >
-                              <RemoveCircleOutlineIcon />
+                              <AddCircleOutlineIcon />
                             </IconButton>
-                          )}
+                            <Typography variant="body2" sx={{ mr: 1 }}>他の重さを追加</Typography>
+                            {rows.length > 1 && (
+                              <IconButton
+                                onClick={() => handleRemoveRow(product.id, row.id)}
+                                disabled={loading}
+                                size="small"
+                              >
+                                <RemoveCircleOutlineIcon />
+                              </IconButton>
+                            )}
+                          </Box>
                         </TableCell>
                       )}
                     </TableRow>
@@ -430,9 +479,23 @@ function ReturnForm() {
           </TableContainer>
         )}
         
-        <Button type="submit" variant="contained" size="large" disabled={loading} sx={{ mt: 3 }}>
-          {loading ? <CircularProgress size={24} color="inherit" /> : '記録する'}
-        </Button>
+        {/* 固定フッターの記録ボタン */}
+        <Box sx={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1000,
+          p: 2,
+          bgcolor: 'background.paper',
+          boxShadow: 3,
+          display: 'flex',
+          justifyContent: 'center',
+        }}>
+          <Button type="submit" variant="contained" size="large" disabled={loading} fullWidth={isMobile}>
+            {loading ? <CircularProgress size={24} color="inherit" /> : '記録する'}
+          </Button>
+        </Box>
       </form>
     </Box>
   );
