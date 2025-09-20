@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import InventoryList from './components/InventoryList';
-import ReturnForm from './components/ReturnForm';
-import UsageHistory from './components/UsageHistory';
-import Dashboard from './components/Dashboard'; // Dashboardをインポート
-import ProductList from './components/ProductList'; // ProductListをインポート
+import InventoryList from './components/InventoryList.jsx';
+import ReturnForm from './components/ReturnForm.jsx';
+import UsageHistory from './components/UsageHistory.jsx';
+import Dashboard from './components/Dashboard.jsx'; // Dashboardをインポート
+import ProductList from './components/ProductList.jsx'; // ProductListをインポート
 
 // MUI Components
 import AppBar from '@mui/material/AppBar';

@@ -13,19 +13,19 @@ import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid'; // 追加
-import Card from '@mui/material/Card'; // 追加
-import CardContent from '@mui/material/CardContent'; // 追加
-import useMediaQuery from '@mui/material/useMediaQuery'; // 追加
-import { useTheme } from '@mui/material/styles'; // 追加
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 function InventoryList() {
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const theme = useTheme(); // 追加
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // 追加
+  const theme = useTheme();
+  const isMobileOrTablet = useMediaQuery(theme.breakpoints.down('md')); // md未満がスマホ・タブレット
 
   useEffect(() => {
     const getInventory = async () => {
@@ -65,13 +65,30 @@ function InventoryList() {
       </Typography>
       {inventory.length === 0 ? (
         <Typography variant="body1">在庫データがありません。</Typography>
-      ) : isMobile ? ( // モバイル表示の場合
-        <Grid container spacing={2}>
+      ) : isMobileOrTablet ? ( // スマホ・タブレット表示の場合
+        <Grid container spacing={2} alignItems="stretch">
           {inventory.map((item, index) => (
-            <Grid item xs={12} sm={12} key={index}>
-              <Card sx={{ width: "100%", height: 150, display: "flex", flexDirection: "column" }}>
+            <Grid item xs={12} key={index}>
+              <Card sx={{
+                width: "100%",
+                height: '100%',
+                display: "flex",
+                flexDirection: "column",
+                flexGrow: 1, // Gridアイテム内で高さを最大限に利用
+              }}>
                 <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-                  <Typography variant="h6" component="div" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                  <Typography
+                    variant="h6"
+                    component="div"
+                    sx={{
+                      whiteSpace: 'normal',
+                      wordBreak: 'break-word',
+                      overflow: "hidden",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 1, // 最大1行まで表示
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
                     {item['商品名']}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
