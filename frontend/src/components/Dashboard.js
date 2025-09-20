@@ -44,7 +44,7 @@ function Dashboard() {
       <Grid container spacing={3}>
         {features.map((feature) => (
           <Grid item xs={12} sm={6} md={4} key={feature.name}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', maxWidth: 345 }}>
               <CardActionArea component={Link} to={feature.path} sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                 <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 3, minHeight: '180px' }}>
                   {feature.icon}
