@@ -58,7 +58,7 @@ function UsageHistory() {
       ) : isMobile ? ( // モバイル表示の場合
         <Grid container spacing={2}>
           {history.map((row, index) => (
-            <Grid item xs={12} sm={6} key={index}>
+            <Grid item xs={12} sm={6} md={3} key={index}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" component="div">

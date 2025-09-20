@@ -151,7 +151,7 @@ function ProductList() {
       ) : isMobile ? ( // モバイル表示の場合
         <Grid container spacing={2}>
           {products.map((product) => (
-            <Grid item xs={12} sm={6} key={product.id}>
+            <Grid item xs={12} sm={6} md={3} key={product.id}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" component="div">
