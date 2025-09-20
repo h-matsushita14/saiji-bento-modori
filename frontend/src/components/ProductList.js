@@ -3,11 +3,14 @@ import {
   Box, Typography, Button, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, IconButton, Dialog, DialogActions,
   DialogContent, DialogTitle, TextField, Snackbar, Alert,
-  RadioGroup, FormControlLabel, Radio, FormControl, FormLabel, CircularProgress
+  RadioGroup, FormControlLabel, Radio, FormControl, FormLabel, CircularProgress,
+  Grid, Card, CardContent // 追加
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import useMediaQuery from '@mui/material/useMediaQuery'; // 追加
+import { useTheme } from '@mui/material/styles'; // 追加
 
 import { fetchProducts, addProduct, updateProduct, deleteProduct } from '../api';
 
@@ -22,6 +25,9 @@ function ProductList() {
   });
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [loading, setLoading] = useState(false);
+
+  const theme = useTheme(); // 追加
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // 追加
 
   useEffect(() => {
     loadProducts();
@@ -135,33 +141,57 @@ function ProductList() {
         商品を追加
       </Button>
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="product table">
-          <TableHead>
-            <TableRow>
-              <TableCell>商品名</TableCell>
-              <TableCell>単位</TableCell>
-              <TableCell>重さ入力</TableCell>
-              <TableCell align="right">操作</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+          <CircularProgress />
+          <Typography sx={{ ml: 2 }}>読み込み中...</Typography>
+        </Box>
+      ) : products.length === 0 ? (
+        <Alert severity="info">商品が登録されていません。</Alert>
+      ) : isMobile ? ( // モバイル表示の場合
+        <Grid container spacing={2}>
+          {products.map((product) => (
+            <Grid item xs={12} sm={6} key={product.id}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" component="div">
+                    {product['商品名']}
+                  </Typography>
+                  <Typography color="text.secondary">
+                    単位: {product['単位']}
+                  </Typography>
+                  <Typography variant="body2">
+                    重さ入力: {product['重さ入力']}
+                  </Typography>
+                  <Box sx={{ mt: 1 }}>
+                    <IconButton aria-label="edit" onClick={() => handleOpenDialog(product)} disabled={loading} size="small">
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton aria-label="delete" onClick={() => handleDelete(product.id)} disabled={loading} size="small">
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      ) : ( // PC表示の場合
+        <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+          <Table aria-label="product table">
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={4} align="center">
-                  <CircularProgress />
-                  <Typography>読み込み中...</Typography>
-                </TableCell>
+                <TableCell>商品名</TableCell>
+                <TableCell>単位</TableCell>
+                <TableCell>重さ入力</TableCell>
+                <TableCell align="right">操作</TableCell>
               </TableRow>
-            ) : products.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} align="center">商品が登録されていません。</TableCell>
-              </TableRow>
-            ) : (
-              products.map((product) => (
+            </TableHead>
+            <TableBody>
+              {products.map((product) => (
                 <TableRow
                   key={product.id}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  sx={{ '&:last-child td, '&:last-child th': { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
                     {product['商品名']}
@@ -182,6 +212,7 @@ function ProductList() {
           </TableBody>
         </Table>
       </TableContainer>
+      )}
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>{editingProduct ? '商品を編集' : '商品を追加'}</DialogTitle>

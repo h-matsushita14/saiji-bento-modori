@@ -25,11 +25,18 @@ import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import useMediaQuery from '@mui/material/useMediaQuery'; // 追加
+import { useTheme } from '@mui/material/styles'; // 追加
+import Card from '@mui/material/Card'; // 追加
+import CardContent from '@mui/material/CardContent'; // 追加
 
 function ReturnForm() {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]); // 商品マスタデータ
   const [productFormValues, setProductFormValues] = useState({}); // 各商品の数量と重さ
+
+  const theme = useTheme(); // 追加
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // 追加
 
   // 今日の日付を取得
   const getToday = () => {
@@ -196,7 +203,7 @@ function ReturnForm() {
             戻り記録日
           </Typography>
           <Grid container spacing={2}>
-            <Grid xs={4}>
+            <Grid item xs={12} sm={4} md={4}> {/* レスポンシブ対応 */}
               <FormControl fullWidth error={!!errors.年} disabled={loading}>
                 <InputLabel>年</InputLabel>
                 <Select
@@ -217,7 +224,7 @@ function ReturnForm() {
                 {errors.年 && <FormHelperText>{errors.年}</FormHelperText>}
               </FormControl>
             </Grid>
-            <Grid xs={4}>
+            <Grid item xs={12} sm={4} md={4}> {/* レスポンシブ対応 */}
               <FormControl fullWidth error={!!errors.月} disabled={loading}>
                 <InputLabel>月</InputLabel>
                 <Select
@@ -235,7 +242,7 @@ function ReturnForm() {
                 {errors.月 && <FormHelperText>{errors.月}</FormHelperText>}
               </FormControl>
             </Grid>
-            <Grid xs={4}>
+            <Grid item xs={12} sm={4} md={4}> {/* レスポンシブ対応 */}
               <FormControl fullWidth error={!!errors.日} disabled={loading}>
                 <InputLabel>日</InputLabel>
                 <Select
@@ -281,9 +288,71 @@ function ReturnForm() {
           </Box>
         ) : products.length === 0 ? (
           <Alert severity="info">登録されている商品がありません。取扱商品ページから商品を登録してください。</Alert>
-        ) : (
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="商品戻り記録テーブル">
+        ) : isMobile ? ( // モバイル表示の場合
+          <Grid container spacing={2}>
+            {products.flatMap(product => {
+              const rows = productFormValues[product.id] || [];
+              return rows.map((row, index) => (
+                <Grid item xs={12} key={`${product.id}-${row.id}`}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6" component="div">
+                        {product['商品名']}
+                      </Typography>
+                      {product['重さ入力'] === '有' && (
+                        <TextField
+                          label="重さ (kg)"
+                          size="small"
+                          type="number"
+                          value={row.重さ || ''}
+                          onChange={(e) => handleProductValueChange(product.id, row.id, '重さ', e.target.value)}
+                          inputProps={{ min: 0, step: "0.01" }}
+                          disabled={loading}
+                          fullWidth
+                          sx={{ mt: 1 }}
+                        />
+                      )}
+                      <TextField
+                        label="数量"
+                        size="small"
+                        type="number"
+                        value={row.数量 || ''}
+                        onChange={(e) => handleProductValueChange(product.id, row.id, '数量', e.target.value)}
+                        inputProps={{ min: 0 }}
+                        disabled={loading}
+                        fullWidth
+                        sx={{ mt: 1 }}
+                      />
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                        単位: {product['単位']}
+                      </Typography>
+                      <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                        <IconButton
+                          onClick={() => handleAddRow(product.id)}
+                          disabled={loading}
+                          size="small"
+                        >
+                          <AddCircleOutlineIcon />
+                        </IconButton>
+                        {rows.length > 1 && (
+                          <IconButton
+                            onClick={() => handleRemoveRow(product.id, row.id)}
+                            disabled={loading}
+                            size="small"
+                          >
+                            <RemoveCircleOutlineIcon />
+                          </IconButton>
+                        )}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ));
+            })}
+          </Grid>
+        ) : ( // PC表示の場合
+          <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+            <Table aria-label="商品戻り記録テーブル">
               <TableHead>
                 <TableRow>
                   <TableCell>商品名</TableCell>

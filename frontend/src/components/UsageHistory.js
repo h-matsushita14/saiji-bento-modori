@@ -13,11 +13,19 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
+import Grid from '@mui/material/Grid'; // 追加
+import Card from '@mui/material/Card'; // 追加
+import CardContent from '@mui/material/CardContent'; // 追加
+import useMediaQuery from '@mui/material/useMediaQuery'; // 追加
+import { useTheme } from '@mui/material/styles'; // 追加
 
 function UsageHistory() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const theme = useTheme(); // 追加
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // 追加
 
   useEffect(() => {
     const loadHistory = async () => {
@@ -45,9 +53,34 @@ function UsageHistory() {
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
           <CircularProgress />
         </Box>
-      ) : (
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="usage history table">
+      ) : history.length === 0 ? (
+        <Alert severity="info">使用履歴がありません。</Alert>
+      ) : isMobile ? ( // モバイル表示の場合
+        <Grid container spacing={2}>
+          {history.map((row, index) => (
+            <Grid item xs={12} sm={6} key={index}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" component="div">
+                    {row.商品名}
+                  </Typography>
+                  <Typography color="text.secondary">
+                    管理No.: {row.管理No}
+                  </Typography>
+                  <Typography variant="body2">
+                    使用日: {new Date(row.使用日).toLocaleDateString()}
+                  </Typography>
+                  <Typography variant="body1">
+                    使用数: {row.使用数}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      ) : ( // PC表示の場合
+        <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+          <Table aria-label="usage history table">
             <TableHead>
               <TableRow>
                 <TableCell>管理No.</TableCell>
@@ -60,7 +93,7 @@ function UsageHistory() {
               {history.map((row) => (
                 <TableRow
                   key={`${row.管理No}-${row.使用日}`}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  sx={{ '&:last-child td, '&:last-child th': { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
                     {row.管理No}

@@ -13,11 +13,19 @@ import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid'; // 追加
+import Card from '@mui/material/Card'; // 追加
+import CardContent from '@mui/material/CardContent'; // 追加
+import useMediaQuery from '@mui/material/useMediaQuery'; // 追加
+import { useTheme } from '@mui/material/styles'; // 追加
 
 function InventoryList() {
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const theme = useTheme(); // 追加
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // 追加
 
   useEffect(() => {
     const getInventory = async () => {
@@ -57,9 +65,29 @@ function InventoryList() {
       </Typography>
       {inventory.length === 0 ? (
         <Typography variant="body1">在庫データがありません。</Typography>
-      ) : (
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="inventory table">
+      ) : isMobile ? ( // モバイル表示の場合
+        <Grid container spacing={2}>
+          {inventory.map((item, index) => (
+            <Grid item xs={12} sm={6} key={index}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" component="div">
+                    {item['商品名']}
+                  </Typography>
+                  <Typography color="text.secondary">
+                    管理No.: {item['管理No.']}
+                  </Typography>
+                  <Typography variant="body1">
+                    在庫: {item['在庫']}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      ) : ( // PC表示の場合
+        <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+          <Table aria-label="inventory table">
             <TableHead>
               <TableRow>
                 <TableCell>管理No.</TableCell>
