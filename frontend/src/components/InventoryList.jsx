@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { fetchInventory } from '../api';
+import { useData } from '../contexts/DataContext'; // 変更
 
 // MUI Components
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
@@ -19,44 +18,53 @@ import CardContent from '@mui/material/CardContent';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 
+// 在庫計算ロジック
+const calculateInventory = (returnRecords, usageHistory) => {
+  const inventoryMap = new Map();
+
+  // 戻り記録から在庫を積み上げ
+  returnRecords.forEach(record => {
+    const managementNo = record['管理No.'];
+    if (!managementNo) return;
+
+    const quantity = Number(record['数量']) || 0;
+    const productName = record['商品名'];
+
+    if (!inventoryMap.has(managementNo)) {
+      inventoryMap.set(managementNo, { '商品名': productName, '在庫': 0, '管理No.': managementNo });
+    }
+    inventoryMap.get(managementNo)['在庫'] += quantity;
+  });
+
+  // 使用履歴から在庫を減算
+  usageHistory.forEach(record => {
+    const managementNo = record['管理No.'];
+    if (!managementNo) return;
+
+    const usageQuantity = Number(record['使用数']) || 0;
+
+    if (inventoryMap.has(managementNo)) {
+      inventoryMap.get(managementNo)['在庫'] -= usageQuantity;
+    }
+  });
+
+  return Array.from(inventoryMap.values());
+};
+
 function InventoryList() {
+  const { returnRecords, usageHistory } = useData(); // Contextからデータを取得
   const [inventory, setInventory] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const theme = useTheme();
-  const isMobileOrTablet = useMediaQuery(theme.breakpoints.down('md')); // md未満がスマホ・タブレット
+  const isMobileOrTablet = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
-    const getInventory = async () => {
-      try {
-        const data = await fetchInventory();
-        setInventory(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    getInventory();
-  }, []);
-
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <CircularProgress />
-        <Typography variant="body1" sx={{ ml: 2 }}>在庫を読み込み中...</Typography>
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert severity="error" sx={{ mt: 4 }}>
-        エラー: {error}
-      </Alert>
-    );
-  }
+    // Contextのデータが変更されたら在庫を再計算
+    if (returnRecords.length > 0 || usageHistory.length > 0) {
+      const calculatedInventory = calculateInventory(returnRecords, usageHistory);
+      setInventory(calculatedInventory);
+    }
+  }, [returnRecords, usageHistory]);
 
   return (
     <Box sx={{ mt: 4 }}>
@@ -64,7 +72,7 @@ function InventoryList() {
         在庫一覧
       </Typography>
       {inventory.length === 0 ? (
-        <Typography variant="body1">在庫データがありません。</Typography>
+        <Alert severity="info">在庫データがありません。</Alert>
       ) : isMobileOrTablet ? ( // スマホ・タブレット表示の場合
         <Grid container spacing={2} alignItems="stretch">
           {inventory.map((item, index) => (
@@ -74,7 +82,7 @@ function InventoryList() {
                 height: '100%',
                 display: "flex",
                 flexDirection: "column",
-                flexGrow: 1, // Gridアイテム内で高さを最大限に利用
+                flexGrow: 1,
               }}>
                 <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
                   <Typography
@@ -85,7 +93,7 @@ function InventoryList() {
                       wordBreak: 'break-word',
                       overflow: "hidden",
                       display: "-webkit-box",
-                      WebkitLineClamp: 1, // 最大1行まで表示
+                      WebkitLineClamp: 1,
                       WebkitBoxOrient: "vertical",
                     }}
                   >

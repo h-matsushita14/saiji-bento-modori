@@ -61,3 +61,13 @@ export const fetchUsageHistory = async () => {
   const result = await apiCall(`${API_ENDPOINT}?action=getUsageHistory`, {}, "Error fetching usage history");
   return result.data;
 };
+
+export const fetchEventList = async () => {
+  const result = await apiCall(`${API_ENDPOINT}?action=getEventList`, {}, "Error fetching event list");
+  return result.data;
+};
+
+export const fetchReturnRecords = async () => {
+  const result = await apiCall(`${API_ENDPOINT}?action=getReturnRecords`, {}, "Error fetching return records");
+  return result.data;
+};

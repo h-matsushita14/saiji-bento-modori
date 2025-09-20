@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import reportWebVitals from './reportWebVitals';
+import { DataProvider } from './contexts/DataContext'; // 追加
 
 // MUI Theme
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -23,7 +24,9 @@ root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline /> {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-      <App />
+      <DataProvider>{/* 追加 */}
+        <App />
+      </DataProvider>{/* 追加 */}
     </ThemeProvider>
   </React.StrictMode>
 );

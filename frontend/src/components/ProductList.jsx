@@ -1,23 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box, Typography, Button, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, IconButton, Dialog, DialogActions,
   DialogContent, DialogTitle, TextField, Snackbar, Alert,
-  RadioGroup, FormControlLabel, Radio, FormControl, FormLabel, CircularProgress,
-  Card, CardContent // 追加
+  RadioGroup, FormControlLabel, Radio, FormControl, FormLabel,
+  Card, CardContent
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import useMediaQuery from '@mui/material/useMediaQuery'; // 追加
-import { useTheme } from '@mui/material/styles'; // 追加
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
-import { fetchProducts, addProduct, updateProduct, deleteProduct } from '../api';
+import { useData } from '../contexts/DataContext';
+import { addProduct, updateProduct, deleteProduct } from '../api';
 
 function ProductList() {
-  const [products, setProducts] = useState([]);
+  const { products, reloadData } = useData(); // reloadData を取得
   const [openDialog, setOpenDialog] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null); // 編集中の商品データ
+  const [editingProduct, setEditingProduct] = useState(null);
   const [formValues, setFormValues] = useState({
     '商品名': '',
     '単位': '',
@@ -26,25 +27,8 @@ function ProductList() {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [loading, setLoading] = useState(false);
 
-  const theme = useTheme(); // 追加
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // 追加
-
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  const loadProducts = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchProducts();
-      setProducts(data);
-    } catch (error) {
-      console.error('商品データの取得に失敗しました:', error);
-      setSnackbar({ open: true, message: `商品データの取得に失敗しました: ${error.message}`, severity: 'error' });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleOpenDialog = (product = null) => {
     setEditingProduct(product);
@@ -84,15 +68,12 @@ function ProductList() {
     try {
       let response;
       if (editingProduct) {
-        // 更新
         response = await updateProduct({ ...formValues, id: editingProduct.id });
       } else {
-        // 追加
         response = await addProduct(formValues);
       }
-
       setSnackbar({ open: true, message: response.message, severity: 'success' });
-      loadProducts(); // データ再取得
+      await reloadData(); // データ再取得
       handleCloseDialog();
     } catch (error) {
       console.error('商品の保存に失敗しました:', error);
@@ -110,7 +91,7 @@ function ProductList() {
     try {
       const response = await deleteProduct(productId);
       setSnackbar({ open: true, message: response.message, severity: 'success' });
-      loadProducts(); // データ再取得
+      await reloadData(); // データ再取得
     } catch (error) {
       console.error('商品の削除に失敗しました:', error);
       setSnackbar({ open: true, message: `商品の削除に失敗しました: ${error.message}`, severity: 'error' });
@@ -136,17 +117,12 @@ function ProductList() {
         startIcon={<AddIcon />}
         onClick={() => handleOpenDialog()}
         sx={{ mb: 2 }}
-        disabled={loading} // ローディング中はボタンを無効化
+        disabled={loading}
       >
         商品を追加
       </Button>
 
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress />
-          <Typography sx={{ ml: 2 }}>読み込み中...</Typography>
-        </Box>
-      ) : products.length === 0 ? (
+      {products.length === 0 ? (
         <Alert severity="info">商品が登録されていません。</Alert>
       ) : isMobile ? ( // モバイル表示の場合
         <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
@@ -171,7 +147,7 @@ function ProductList() {
                         <Typography variant="body2" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
                           重さ入力: {product['重さ入力']}
                         </Typography>
-                        <Box sx={{ mt: 1, alignSelf: 'flex-end' }}> {/* ボタンを右寄せにする */}
+                        <Box sx={{ mt: 1, alignSelf: 'flex-end' }}>
                           <IconButton aria-label="edit" onClick={() => handleOpenDialog(product)} disabled={loading} size="small">
                             <EditIcon />
                           </IconButton>
@@ -279,3 +255,4 @@ function ProductList() {
 }
 
 export default ProductList;
+

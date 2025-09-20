@@ -26,6 +26,10 @@ function doGet(e) {
       data = getProductsData();
     } else if (action === 'getUsageHistory') {
       data = getUsageHistoryData();
+    } else if (action === 'getEventList') {
+      data = getEventListData();
+    } else if (action === 'getReturnRecords') {
+      data = getReturnRecordsData();
     } else {
       const masterSheet = spreadsheet.getSheetByName(MASTER_SHEET_NAME);
       const usageSheet = spreadsheet.getSheetByName(USAGE_SHEET_NAME);
@@ -247,4 +251,42 @@ function getUsageHistoryData() {
   });
   
   return history.sort((a, b) => new Date(b['使用日']) - new Date(a['使用日']));
+}
+
+function getEventListData() {
+  const masterSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(MASTER_SHEET_NAME);
+  if (!masterSheet) return [];
+  
+  const data = masterSheet.getDataRange().getValues();
+  if (data.length <= 1) return [];
+  
+  const headers = data.shift();
+  const eventNameIndex = headers.indexOf('催事名');
+  
+  if (eventNameIndex === -1) return [];
+
+  const eventNames = data.map(row => row[eventNameIndex]);
+  const uniqueEventNames = [...new Set(eventNames)].filter(name => name); // 空の名前を除外
+  
+  return uniqueEventNames;
+}
+
+function getReturnRecordsData() {
+  const masterSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(MASTER_SHEET_NAME);
+  if (!masterSheet) return [];
+  
+  const data = masterSheet.getDataRange().getValues();
+  if (data.length <= 1) return [];
+  
+  const headers = data.shift();
+  
+  const records = data.map(row => {
+    const record = {};
+    headers.forEach((header, i) => {
+      record[header] = row[i];
+    });
+    return record;
+  });
+  
+  return records;
 }

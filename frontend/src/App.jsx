@@ -3,8 +3,10 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import InventoryList from './components/InventoryList.jsx';
 import ReturnForm from './components/ReturnForm.jsx';
 import UsageHistory from './components/UsageHistory.jsx';
-import Dashboard from './components/Dashboard.jsx'; // Dashboardをインポート
-import ProductList from './components/ProductList.jsx'; // ProductListをインポート
+import Dashboard from './components/Dashboard.jsx';
+import ProductList from './components/ProductList.jsx';
+import LoadingScreen from './components/LoadingScreen.jsx'; // 追加
+import { useData } from './contexts/DataContext'; // 追加
 
 // MUI Components
 import AppBar from '@mui/material/AppBar';
@@ -13,18 +15,18 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import IconButton from '@mui/material/IconButton'; // 追加
-import MenuIcon from '@mui/icons-material/Menu'; // 追加
-import Drawer from '@mui/material/Drawer'; // 追加
-import List from '@mui/material/List'; // 追加
-import ListItem from '@mui/material/ListItem'; // 追加
-import ListItemButton from '@mui/material/ListItemButton'; // 追加
-import ListItemText from '@mui/material/ListItemText'; // 追加
-import useMediaQuery from '@mui/material/useMediaQuery'; // 追加
-import { useTheme } from '@mui/material/styles'; // 追加
-
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 function App() {
+  const { isLoading, progress } = useData(); // 追加
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -59,6 +61,12 @@ function App() {
       </List>
     </Box>
   );
+
+  // 読み込み中の表示
+  if (isLoading) {
+    return <LoadingScreen progress={progress} />;
+  }
+
   return (
     <BrowserRouter>
       <Box sx={{ flexGrow: 1 }}>
@@ -114,11 +122,11 @@ function App() {
 
         <Container sx={{ mt: 4 }}>
           <Routes>
-            <Route path="/" element={<Dashboard />} /> {/* HomeをDashboardに変更 */}
+            <Route path="/" element={<Dashboard />} />
             <Route path="/inventory" element={<InventoryList />} />
             <Route path="/return" element={<ReturnForm />} />
             <Route path="/usage" element={<UsageHistory />} />
-            <Route path="/products" element={<ProductList />} /> {/* 追加 */}
+            <Route path="/products" element={<ProductList />} />
           </Routes>
         </Container>
       </Box>

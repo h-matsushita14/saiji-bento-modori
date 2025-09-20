@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { addReturnRecord, fetchProducts } from '../api';
+import { addReturnRecord } from '../api';
 import useFormValidation from '../hooks/useFormValidation';
+import { useData } from '../contexts/DataContext'; // 追加
 
 // MUI Components
 import Box from '@mui/material/Box';
@@ -29,11 +30,12 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import Autocomplete from '@mui/material/Autocomplete'; // 追加
 
 function ReturnForm() {
+  const { products, eventList } = useData(); // データ取得をContextからに変更
   const [loading, setLoading] = useState(false);
-  const [products, setProducts] = useState([]); // 商品マスタデータ
-  const [productFormValues, setProductFormValues] = useState({}); // 各商品の数量と重さ
+  const [productFormValues, setProductFormValues] = useState({});
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -75,27 +77,16 @@ function ReturnForm() {
     resetForm,
   } = useFormValidation(initialState, validationRules);
 
-  // 商品マスタの取得
+  // Contextから取得した商品リストに基づいてフォームの初期値を設定
   useEffect(() => {
-    const loadProducts = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchProducts();
-        setProducts(data);
-        // 各商品のフォーム値を初期化
-        const initialProductValues = {};
-        data.forEach(product => {
-          initialProductValues[product.id] = [{ id: 1, 数量: '', 重さ整数: '0', 重さ小数: '0' }];
-        });
-        setProductFormValues(initialProductValues);
-      } catch (err) {
-        setErrors({ api: `商品マスタの取得に失敗しました: ${err.message}` });
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadProducts();
-  }, [setErrors]);
+    if (products.length > 0) {
+      const initialProductValues = {};
+      products.forEach(product => {
+        initialProductValues[product.id] = [{ id: 1, 数量: '', 重さ整数: '0', 重さ小数: '0' }];
+      });
+      setProductFormValues(initialProductValues);
+    }
+  }, [products]);
 
   // 各商品の数量・重さ変更時のハンドラ
   const handleProductValueChange = (productId, rowId, field, value) => {
@@ -181,7 +172,7 @@ function ReturnForm() {
       // 各商品のフォーム値をリセット
       const resetProductValues = {};
       products.forEach(product => {
-        resetProductValues[product.id] = [{ id: 1, 数量: '', 重さ整数: '', 重さ小数: '' }];
+        resetProductValues[product.id] = [{ id: 1, 数量: '', 重さ整数: '0', 重さ小数: '0' }];
       });
       setProductFormValues(resetProductValues);
 
@@ -269,29 +260,32 @@ function ReturnForm() {
         </Box>
         
         <Box sx={{ mb: 3 }}>
-          <TextField
-            fullWidth
-            label="催事名"
-            type="text"
-            name="催事名"
+          <Autocomplete
+            freeSolo
+            options={eventList}
             value={formData.催事名}
-            onChange={handleChange}
-            required
-            error={!!errors.催事名}
-            helperText={errors.催事名}
-            disabled={loading}
+            onInputChange={(event, newInputValue) => {
+              handleChange({ target: { name: '催事名', value: newInputValue } });
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                fullWidth
+                label="催事名"
+                name="催事名"
+                required
+                error={!!errors.催事名}
+                helperText={errors.催事名}
+                disabled={loading}
+              />
+            )}
           />
         </Box>
 
         <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
           商品一覧
         </Typography>
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-            <CircularProgress />
-            <Typography sx={{ ml: 2 }}>商品データを読み込み中...</Typography>
-          </Box>
-        ) : products.length === 0 ? (
+        {products.length === 0 ? (
           <Alert severity="info">登録されている商品がありません。取扱商品ページから商品を登録してください。</Alert>
         ) : isMobile ? ( // モバイル表示の場合
           <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>

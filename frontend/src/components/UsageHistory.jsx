@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { fetchUsageHistory } from '../api';
+import React from 'react';
+import { useData } from '../contexts/DataContext'; // 変更
 
 // MUI Components
 import Box from '@mui/material/Box';
@@ -12,52 +12,30 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Alert from '@mui/material/Alert';
-import CircularProgress from '@mui/material/CircularProgress';
-import Grid from '@mui/material/Grid'; // 追加
-import Card from '@mui/material/Card'; // 追加
-import CardContent from '@mui/material/CardContent'; // 追加
-import useMediaQuery from '@mui/material/useMediaQuery'; // 追加
-import { useTheme } from '@mui/material/styles'; // 追加
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 function UsageHistory() {
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { usageHistory } = useData(); // 変更
 
-  const theme = useTheme(); // 追加
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // 追加
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  useEffect(() => {
-    const loadHistory = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchUsageHistory();
-        setHistory(data);
-      } catch (err) {
-        setError(`履歴の読み込みに失敗しました: ${err.message}`);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadHistory();
-  }, []);
+  // useEffect, useState(loading, error) は削除
 
   return (
     <Box sx={{ mt: 4 }}>
       <Typography variant="h4" component="h2" gutterBottom>
         使用履歴
       </Typography>
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : history.length === 0 ? (
+      {usageHistory.length === 0 ? (
         <Alert severity="info">使用履歴がありません。</Alert>
       ) : isMobile ? ( // モバイル表示の場合
         <Grid container spacing={2}>
-          {history.map((row, index) => (
+          {usageHistory.map((row, index) => (
             <Grid item xs={12} sm={12} md={6} key={index}>
               <Card sx={{ width: "100%", height: 150, display: "flex", flexDirection: "column" }}>
                 <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -90,9 +68,9 @@ function UsageHistory() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {history.map((row) => (
+              {usageHistory.map((row, index) => (
                 <TableRow
-                  key={`${row.管理No}-${row.使用日}`}
+                  key={`${row.管理No}-${row.使用日}-${index}`}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
