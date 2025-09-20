@@ -207,8 +207,7 @@ function ProductList() {
                     </IconButton>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
