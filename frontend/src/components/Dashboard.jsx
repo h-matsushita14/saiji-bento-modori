@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Box, Typography, Card, CardContent, CardActionArea, useMediaQuery, useTheme,
-  TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Grid
+  TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody
 } from '@mui/material';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import AssignmentReturnIcon from '@mui/icons-material/AssignmentReturn';
@@ -123,29 +123,37 @@ function Dashboard() {
       )}
 
       {!isMobileOrTablet && (
-        <Grid container spacing={4}>
-          {features.map((feature) => (
-            <Grid item xs={12} md={6} key={feature.name}>
-              <Card sx={{ height: '100%', width: '100%', display: 'flex' }}>
-                <CardActionArea
-                  component={Link}
-                  to={feature.path}
-                  sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', p: 3, textAlign: 'center' }}
-                >
-                  <Box sx={{ mb: 2 }}>{feature.icon}</Box>
-                  <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                      {feature.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {feature.description}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        <TableContainer component={Paper}>
+          <Table sx={{ tableLayout: 'fixed' }}>
+            <TableBody>
+              {[0, 2].map(rowIndex => (
+                <TableRow key={rowIndex}>
+                  {features.slice(rowIndex, rowIndex + 2).map(feature => (
+                    <TableCell key={feature.name} sx={{ p: 2, border: '1px solid rgba(224, 224, 224, 1)' }}>
+                      <Card sx={{ height: '100%', width: '100%', display: 'flex', boxShadow: 'none' }}>
+                        <CardActionArea
+                          component={Link}
+                          to={feature.path}
+                          sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', p: 3, textAlign: 'center', flexGrow: 1 }}
+                        >
+                          <Box sx={{ mb: 2 }}>{feature.icon}</Box>
+                          <CardContent>
+                            <Typography gutterBottom variant="h5" component="div">
+                              {feature.name}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {feature.description}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
     </Box>
   );
