@@ -46,7 +46,8 @@ function Dashboard() {
           <Grid item xs={12} sm={6} md={3} key={feature.name}>
             <Card
               sx={{
-                height: "100%", // Gridの高さに合わせる
+                height: 200, // 固定の高さを設定
+                width: "100%", // 幅を100%に固定
                 display: "flex",
                 flexDirection: "column",
               }}
@@ -55,29 +56,45 @@ function Dashboard() {
                 component={Link}
                 to={feature.path}
                 sx={{
-                  flexGrow: 1,
+                  height: "100%", // カード全体の高さに合わせる
                   display: "flex",
                   flexDirection: "column",
                 }}
               >
                 <CardContent
                   sx={{
-                    flexGrow: 1,
+                    height: "100%", // CardActionAreaの高さに合わせる
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
                     p: 3,
+                    textAlign: "center", // テキストを中央揃え
                   }}
                 >
                   {feature.icon}
-                  <Typography variant="h6" component="div" sx={{ mt: 1 }}>
+                  <Typography 
+                    variant="h6" 
+                    component="div" 
+                    sx={{ 
+                      mt: 1,
+                      mb: 1,
+                      minHeight: "1.5em", // タイトルの最小高さを設定
+                    }}
+                  >
                     {feature.name}
                   </Typography>
                   <Typography
                     variant="body2"
                     color="text.secondary"
-                    sx={{ textAlign: "center", mt: 1 }}
+                    sx={{ 
+                      textAlign: "center",
+                      lineHeight: 1.4,
+                      overflow: "hidden", // テキストがはみ出た場合の対処
+                      display: "-webkit-box",
+                      WebkitLineClamp: 3, // 最大3行まで表示
+                      WebkitBoxOrient: "vertical",
+                    }}
                   >
                     {feature.description}
                   </Typography>
