@@ -19,7 +19,6 @@ import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
-import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
@@ -312,7 +311,6 @@ function ReturnForm() {
                               <InputLabel>重さ (整数)</InputLabel>
                               <Select
                                 value={row.重さ整数 || ''}
-                                label="重さ (整数)"
                                 onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
                               >
                                 {Array.from({ length: 10 }, (_, i) => (
@@ -332,7 +330,6 @@ function ReturnForm() {
                               <InputLabel>小数</InputLabel>
                               <Select
                                 value={row.重さ小数 || ''}
-                                label="小数"
                                 onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
                               >
                                 {Array.from({ length: 10 }, (_, i) => (
@@ -420,7 +417,6 @@ function ReturnForm() {
                               <InputLabel>整数</InputLabel>
                               <Select
                                 value={row.重さ整数 || ''}
-                                label="整数"
                                 onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
                               >
                                 {Array.from({ length: 10 }, (_, i) => (
@@ -436,7 +432,6 @@ function ReturnForm() {
                               <InputLabel>小数</InputLabel>
                               <Select
                                 value={row.重さ小数 || ''}
-                                label="小数"
                                 onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
                               >
                                 {Array.from({ length: 10 }, (_, i) => (
