@@ -45,71 +45,81 @@ function Dashboard() {
         機能一覧
       </Typography>
 
-      {/* スマホ〜タブレットサイズでのカード表示 */}
-      {isMobileOrTablet && ( // isMobileOrTablet が true の場合のみ表示
-        <Grid container spacing={3} alignItems="stretch">
-          {features.map((feature) => (
-            <Grid item xs={12} key={feature.name}>
-              <Card
-                sx={{
-                  height: '100%', // 高さを揃える
-                  width: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  flexGrow: 1, // Gridアイテム内で高さを最大限に利用
-                }}
-              >
-                <CardActionArea
-                  component={Link}
-                  to={feature.path}
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "row", // アイコンとテキストを横並びにする
-                    alignItems: "center", // 垂直方向中央揃え
-                    p: 2, // パディングを調整
-                  }}
-                >
-                  <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>{feature.icon}</Box> {/* アイコンを左に寄せる */}
-                  <CardContent
-                    sx={{
-                      flexGrow: 1, // 残りのスペースを埋める
-                      p: 0, // CardContentのデフォルトパディングをリセット
-                      "&:last-child": { pb: 0 }, // 最後の要素のパディングもリセット
-                    }}
-                  >
-                    <Typography
-                      variant="h6"
-                      component="div"
+      {/* スマホ〜タブレットサイズでのカード表示 (テーブル形式) */}
+      {isMobileOrTablet && (
+        <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+          <Table aria-label="機能一覧テーブル">
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>機能</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {features.map((feature) => (
+                <TableRow key={feature.name}>
+                  <TableCell>
+                    <Card
                       sx={{
-                        mb: 0.5, // タイトルと説明の間のスペース
-                        whiteSpace: 'normal',
-                        wordBreak: 'break-word',
+                        width: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        flexGrow: 1,
                       }}
                     >
-                      {feature.name}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{
-                        lineHeight: 1.4,
-                        overflow: "hidden",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 1, // 最大1行まで表示
-                        WebkitBoxOrient: "vertical",
-                        whiteSpace: 'normal',
-                        wordBreak: 'break-word',
-                      }}
-                    >
-                      {feature.description}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                      <CardActionArea
+                        component={Link}
+                        to={feature.path}
+                        sx={{
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          p: 2,
+                        }}
+                      >
+                        <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>{feature.icon}</Box>
+                        <CardContent
+                          sx={{
+                            flexGrow: 1,
+                            p: 0,
+                            "&:last-child": { pb: 0 },
+                          }}
+                        >
+                          <Typography
+                            variant="h6"
+                            component="div"
+                            sx={{
+                              mb: 0.5,
+                              whiteSpace: 'normal',
+                              wordBreak: 'break-word',
+                            }}
+                          >
+                            {feature.name}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              lineHeight: 1.4,
+                              overflow: "hidden",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 1,
+                              WebkitBoxOrient: "vertical",
+                              whiteSpace: 'normal',
+                              wordBreak: 'break-word',
+                            }}
+                          >
+                            {feature.description}
+                          </Typography>
+                        </CardContent>
+                      </CardActionArea>
+                    </Card>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
 
       {/* PCサイズでのテーブル表示 (ここでは実装しないが、isMobileOrTabletがfalseの場合に表示される想定) */}

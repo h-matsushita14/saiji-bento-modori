@@ -149,33 +149,44 @@ function ProductList() {
       ) : products.length === 0 ? (
         <Alert severity="info">商品が登録されていません。</Alert>
       ) : isMobile ? ( // モバイル表示の場合
-        <Grid container spacing={2}>
-          {products.map((product) => (
-            <Grid item xs={12} sm={12} md={6} key={product.id}>
-              <Card sx={{ width: "100%", height: 150, display: "flex", flexDirection: "column" }}>
-                <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-                  <Typography variant="h6" component="div" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                    {product['商品名']}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                    単位: {product['単位']}
-                  </Typography>
-                  <Typography variant="body2" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                    重さ入力: {product['重さ入力']}
-                  </Typography>
-                  <Box sx={{ mt: 1, alignSelf: 'flex-end' }}> {/* ボタンを右寄せにする */}
-                    <IconButton aria-label="edit" onClick={() => handleOpenDialog(product)} disabled={loading} size="small">
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton aria-label="delete" onClick={() => handleDelete(product.id)} disabled={loading} size="small">
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+          <Table aria-label="商品一覧テーブル">
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>商品</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {products.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell>
+                    <Card sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
+                      <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                        <Typography variant="h6" component="div" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                          {product['商品名']}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                          単位: {product['単位']}
+                        </Typography>
+                        <Typography variant="body2" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                          重さ入力: {product['重さ入力']}
+                        </Typography>
+                        <Box sx={{ mt: 1, alignSelf: 'flex-end' }}> {/* ボタンを右寄せにする */}
+                          <IconButton aria-label="edit" onClick={() => handleOpenDialog(product)} disabled={loading} size="small">
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton aria-label="delete" onClick={() => handleDelete(product.id)} disabled={loading} size="small">
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       ) : ( // PC表示の場合
         <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
           <Table aria-label="product table">
