@@ -309,11 +309,13 @@ function ReturnForm() {
                           <Grid container spacing={1} alignItems="center">
                             <Grid item xs={5}>
                               <FormControl fullWidth size="small" disabled={loading}>
-                                <InputLabel>重さ (整数)</InputLabel>
+                                {/* <InputLabel>重さ (整数)</InputLabel> Removed as per user request */}
                                 <Select
                                   value={row.重さ整数 || ''}
                                   onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
+                                  displayEmpty // Add displayEmpty prop
                                 >
+                                  <MenuItem value="" disabled>整数</MenuItem> {/* Placeholder */}
                                   {Array.from({ length: 10 }, (_, i) => (
                                     <MenuItem key={i} value={i}>
                                       {i}
@@ -327,11 +329,13 @@ function ReturnForm() {
                             </Grid>
                             <Grid item xs={5}>
                               <FormControl fullWidth size="small" disabled={loading}>
-                                <InputLabel>小数</InputLabel>
+                                {/* <InputLabel>小数</InputLabel> Removed as per user request */}
                                 <Select
                                   value={row.重さ小数 || ''}
                                   onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
+                                  displayEmpty // Add displayEmpty prop
                                 >
+                                  <MenuItem value="" disabled>小数</MenuItem> {/* Placeholder */}
                                   {Array.from({ length: 10 }, (_, i) => (
                                     <MenuItem key={i} value={i}>
                                       {i}
@@ -347,7 +351,7 @@ function ReturnForm() {
                         </Box>
                       )}
                       <FormControl fullWidth size="small" sx={{ mt: 1 }} disabled={loading}>
-                        <InputLabel>数量</InputLabel>
+                        {/* <InputLabel>数量</InputLabel> Removed, relying on Select's label prop */}
                         <Select
                           value={row.数量 || ''}
                           label="数量"
@@ -415,11 +419,13 @@ function ReturnForm() {
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                             {/* 整数部のドロップダウン */}
                             <FormControl size="small" sx={{ width: 60 }} disabled={loading}>
-                              <InputLabel>整数</InputLabel>
+                              {/* <InputLabel>整数</InputLabel> Removed as per user request */}
                               <Select
                                 value={row.重さ整数 || ''}
                                 onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
+                                displayEmpty // Add displayEmpty prop
                               >
+                                <MenuItem value="" disabled>整数</MenuItem> {/* Placeholder */}
                                 {Array.from({ length: 10 }, (_, i) => (
                                   <MenuItem key={i} value={i}>
                                     {i}
@@ -430,11 +436,13 @@ function ReturnForm() {
                             <Typography variant="body1">.</Typography>
                             {/* 小数部のドロップダウン */}
                             <FormControl size="small" sx={{ width: 40 }} disabled={loading}>
-                              <InputLabel>小数</InputLabel>
+                              {/* <InputLabel>小数</InputLabel> Removed as per user request */}
                               <Select
                                 value={row.重さ小数 || ''}
                                 onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
+                                displayEmpty // Add displayEmpty prop
                               >
+                                <MenuItem value="" disabled>小数</MenuItem> {/* Placeholder */}
                                 {Array.from({ length: 10 }, (_, i) => (
                                   <MenuItem key={i} value={i}>
                                     {i}
