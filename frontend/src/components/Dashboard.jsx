@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Box, Typography, Grid, Card, CardContent, CardActionArea, useMediaQuery, useTheme,
+  Box, Typography, Card, CardContent, CardActionArea, useMediaQuery, useTheme,
   TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody
 } from '@mui/material';
 import InventoryIcon from '@mui/icons-material/Inventory';
