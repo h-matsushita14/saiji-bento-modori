@@ -41,17 +41,44 @@ function Dashboard() {
       <Typography variant="h4" component="h1" gutterBottom>
         ダッシュボード
       </Typography>
-      <Grid container spacing={3}>
+      <Grid container spacing={3} alignItems="stretch">
         {features.map((feature) => (
           <Grid item xs={12} sm={6} md={4} key={feature.name}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', maxWidth: 345 }}>
-              <CardActionArea component={Link} to={feature.path} sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 3, minHeight: '180px' }}>
+            <Card
+              sx={{
+                height: "100%", // Gridの高さに合わせる
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <CardActionArea
+                component={Link}
+                to={feature.path}
+                sx={{
+                  flexGrow: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <CardContent
+                  sx={{
+                    flexGrow: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    p: 3,
+                  }}
+                >
                   {feature.icon}
                   <Typography variant="h6" component="div" sx={{ mt: 1 }}>
                     {feature.name}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 1 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ textAlign: "center", mt: 1 }}
+                  >
                     {feature.description}
                   </Typography>
                 </CardContent>
