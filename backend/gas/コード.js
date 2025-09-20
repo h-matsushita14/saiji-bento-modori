@@ -7,12 +7,7 @@ const PRODUCT_SHEET_NAME = '商品'; // 追加
  * CORSプリフライトリクエスト (OPTIONS) に対応します。
  */
 function doOptions() {
-  return ContentService.createTextOutput()
-    .setHeaders({
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
-    });
+  return ContentService.createTextOutput();
 }
 
 /**
@@ -65,12 +60,7 @@ function doGet(e) {
   }
   
   return ContentService.createTextOutput(JSON.stringify(response))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeaders({
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
-    });
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 /**
@@ -118,12 +108,7 @@ function doPost(e) {
   }
   
   return ContentService.createTextOutput(JSON.stringify(response))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeaders({
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
-    });
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function addReturnRecord(data) {
