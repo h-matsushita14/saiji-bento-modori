@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Box, Typography, Card, CardContent, CardActionArea, useMediaQuery, useTheme,
-  TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody
+  TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Grid
 } from '@mui/material';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import AssignmentReturnIcon from '@mui/icons-material/AssignmentReturn';
@@ -11,7 +11,7 @@ import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 
 function Dashboard() {
   const theme = useTheme();
-  const isMobileOrTablet = useMediaQuery(theme.breakpoints.down('md')); // md未満がスマホ・タブレット
+  const isMobileOrTablet = useMediaQuery(theme.breakpoints.down('md'));
 
   const features = [
     {
@@ -27,7 +27,7 @@ function Dashboard() {
       path: '/return',
     },
     {
-      name: '使用数記録',
+      name: '使用履歴',
       description: '商品の使用数を記録します。',
       icon: <BarChartIcon sx={{ fontSize: 40 }} />,
       path: '/usage',
@@ -46,7 +46,6 @@ function Dashboard() {
         機能一覧
       </Typography>
 
-      {/* スマホ〜タブレットサイズでのカード表示 (テーブル形式) */}
       {isMobileOrTablet && (
         <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
           <Table aria-label="機能一覧テーブル">
@@ -123,12 +122,30 @@ function Dashboard() {
         </TableContainer>
       )}
 
-      {/* PCサイズでのテーブル表示 (ここでは実装しないが、isMobileOrTabletがfalseの場合に表示される想定) */}
       {!isMobileOrTablet && (
-        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-          {/* ここにPC用のテーブル表示コンポーネントを配置する */}
-          <Typography variant="body1">PCサイズではテーブル表示がここに表示されます。</Typography>
-        </Box>
+        <Grid container spacing={4}>
+          {features.map((feature) => (
+            <Grid item xs={12} md={6} key={feature.name}>
+              <Card sx={{ height: '100%', display: 'flex' }}>
+                <CardActionArea
+                  component={Link}
+                  to={feature.path}
+                  sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', p: 3, textAlign: 'center' }}
+                >
+                  <Box sx={{ mb: 2 }}>{feature.icon}</Box>
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      {feature.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {feature.description}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       )}
     </Box>
   );
