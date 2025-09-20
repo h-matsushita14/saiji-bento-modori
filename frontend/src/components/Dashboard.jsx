@@ -28,7 +28,7 @@ function Dashboard() {
     },
     {
       name: '使用履歴',
-      description: '商品の使用数を記録します。',
+      description: '商品の使用履歴を参照します。',
       icon: <BarChartIcon sx={{ fontSize: 40 }} />,
       path: '/usage',
     },
@@ -126,7 +126,7 @@ function Dashboard() {
         <Grid container spacing={4}>
           {features.map((feature) => (
             <Grid item xs={12} md={6} key={feature.name}>
-              <Card sx={{ height: '100%', display: 'flex' }}>
+              <Card sx={{ height: '100%', width: '100%', display: 'flex' }}>
                 <CardActionArea
                   component={Link}
                   to={feature.path}
@@ -152,3 +152,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
