@@ -261,11 +261,10 @@ function ReturnForm() {
         
         <Box sx={{ mb: 3 }}>
           <Autocomplete
-            freeSolo
             options={eventList}
             value={formData.催事名}
-            onInputChange={(event, newInputValue) => {
-              handleChange({ target: { name: '催事名', value: newInputValue } });
+            onChange={(event, newValue) => {
+              handleChange({ target: { name: '催事名', value: newValue || '' } });
             }}
             renderInput={(params) => (
               <TextField
