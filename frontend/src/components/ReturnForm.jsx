@@ -33,7 +33,7 @@ import CardContent from '@mui/material/CardContent';
 import Autocomplete from '@mui/material/Autocomplete'; // 追加
 
 function ReturnForm() {
-  const { products, eventList } = useData(); // データ取得をContextからに変更
+  const { products, eventList, reloadData } = useData(); // reloadDataを追加
   const [loading, setLoading] = useState(false);
   const [productFormValues, setProductFormValues] = useState({});
 
@@ -175,6 +175,9 @@ function ReturnForm() {
         resetProductValues[product.id] = [{ id: 1, 数量: '', 重さ整数: '0', 重さ小数: '0' }];
       });
       setProductFormValues(resetProductValues);
+
+      // データを再読み込み
+      await reloadData();
 
     } catch (err) {
       setMessage('');
