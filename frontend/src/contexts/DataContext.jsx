@@ -31,6 +31,7 @@ export const DataProvider = ({ children }) => {
       setProgress((completedSteps / totalSteps) * 100);
 
       const eventListData = await fetchEventList();
+      console.log('Fetched Event List Data:', eventListData); // デバッグログ
       setEventList(eventListData);
       completedSteps++;
       setProgress((completedSteps / totalSteps) * 100);
@@ -56,6 +57,11 @@ export const DataProvider = ({ children }) => {
   useEffect(() => {
     loadAllData();
   }, [loadAllData]);
+
+  // デバッグログ
+  useEffect(() => {
+    console.log('Event List State Updated:', eventList);
+  }, [eventList]);
 
   const value = {
     products,

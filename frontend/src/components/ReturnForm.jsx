@@ -34,6 +34,7 @@ import Autocomplete from '@mui/material/Autocomplete'; // 追加
 
 function ReturnForm() {
   const { products, eventList, reloadData } = useData(); // reloadDataを追加
+  console.log('Event List in ReturnForm:', eventList); // デバッグログ
   const [loading, setLoading] = useState(false);
   const [productFormValues, setProductFormValues] = useState({});
 
