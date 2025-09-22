@@ -7,13 +7,6 @@ const apiCall = async (url, options, errorMessagePrefix) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const result = await response.json();
-
-    // デバッグ用：statusが'debug'の場合、コンソールに詳細を出力
-    if (result.status === 'debug') {
-      console.log('DEBUG RESPONSE:', result);
-      throw new Error('Debug mode: Check console for details.');
-    }
-
     if (result.status === 'error') {
       throw new Error(result.message);
     }

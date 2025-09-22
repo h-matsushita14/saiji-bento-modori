@@ -296,7 +296,7 @@ function ReturnForm() {
         
         <Box sx={{ mb: 3 }}>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={8} sm={9}>
+            <Grid item xs>
               <Autocomplete
                 options={eventList}
                 value={formData.催事名}
@@ -317,8 +317,8 @@ function ReturnForm() {
                 )}
               />
             </Grid>
-            <Grid item xs={4} sm={3}>
-              <Button variant="contained" onClick={handleOpenDialog} disabled={loading} fullWidth>
+            <Grid item>
+              <Button variant="contained" onClick={handleOpenDialog} disabled={loading}>
                 新規追加
               </Button>
             </Grid>
@@ -409,25 +409,27 @@ function ReturnForm() {
                             <Typography variant="body2" color="text.secondary" sx={{ mt: 1, whiteSpace: 'normal', wordBreak: 'break-word' }}>
                               単位: {product['単位']}
                             </Typography>
-                            <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '100%' }}>
-                              <IconButton
-                                onClick={() => handleAddRow(product.id)}
-                                disabled={loading}
-                                size="small"
-                              >
-                                <AddCircleOutlineIcon />
-                              </IconButton>
-                              <Typography variant="body2" sx={{ mr: 1 }}>他の重さを追加</Typography>
-                              {rows.length > 1 && (
+                            {product['重さ入力'] === '有' && (
+                              <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '100%' }}>
                                 <IconButton
-                                  onClick={() => handleRemoveRow(product.id, row.id)}
+                                  onClick={() => handleAddRow(product.id)}
                                   disabled={loading}
                                   size="small"
                                 >
-                                  <RemoveCircleOutlineIcon />
+                                  <AddCircleOutlineIcon />
                                 </IconButton>
-                              )}
-                            </Box>
+                                <Typography variant="body2" sx={{ mr: 1 }}>他の重さを追加</Typography>
+                                {rows.length > 1 && (
+                                  <IconButton
+                                    onClick={() => handleRemoveRow(product.id, row.id)}
+                                    disabled={loading}
+                                    size="small"
+                                  >
+                                    <RemoveCircleOutlineIcon />
+                                  </IconButton>
+                                )}
+                              </Box>
+                            )}
                           </CardContent>
                         </Card>
                       </TableCell>

@@ -106,17 +106,13 @@ function doPost(e) {
       addEventName(data);
       message = '新しい催事名が追加されました。';
     } else {
-      // デバッグのため、エラーを投げる代わりに受け取ったデータを返す
-      response = { status: 'debug', receivedData: requestData, rawData: e.postData.contents };
-      return ContentService.createTextOutput(JSON.stringify(response))
-        .setMimeType(ContentService.MimeType.JSON);
+      throw new Error('無効なリクエストタイプです。');
     }
     
     response = { status: 'success', message: message };
 
   } catch (error) {
-    // パースエラーなどの場合に備えて、元のpostDataも返す
-    response = { status: 'error', message: error.message, postData: e.postData ? e.postData.contents : 'No post data' };
+    response = { status: 'error', message: error.message };
   }
   
   return ContentService.createTextOutput(JSON.stringify(response))
