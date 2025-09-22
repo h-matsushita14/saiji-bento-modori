@@ -293,34 +293,33 @@ function ReturnForm() {
         </Box>
         
         <Box sx={{ mb: 3 }}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs>
-              <Autocomplete
-                options={eventList}
-                value={formData.催事名}
-                onChange={(event, newValue) => {
-                  handleChange({ target: { name: '催事名', value: newValue || '' } });
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    fullWidth
-                    label="催事名"
-                    name="催事名"
-                    required
-                    error={!!errors.催事名}
-                    helperText={errors.催事名}
-                    disabled={loading}
-                  />
-                )}
+          <Autocomplete
+            options={eventList}
+            value={formData.催事名}
+            onChange={(event, newValue) => {
+              handleChange({ target: { name: '催事名', value: newValue || '' } });
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                fullWidth
+                label="催事名"
+                name="催事名"
+                required
+                error={!!errors.催事名}
+                helperText={errors.催事名}
+                disabled={loading}
               />
-            </Grid>
-            <Grid item>
-              <Button variant="contained" onClick={handleOpenDialog} disabled={loading}>
-                新規追加
-              </Button>
-            </Grid>
-          </Grid>
+            )}
+          />
+          <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+            <Typography variant="body2" sx={{ mr: 1 }}>
+              ※リストに催事名がない場合はこちらから追加⇒
+            </Typography>
+            <Button variant="contained" onClick={handleOpenDialog} disabled={loading}>
+              新規追加
+            </Button>
+          </Box>
         </Box>
 
         <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
