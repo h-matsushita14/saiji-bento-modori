@@ -254,10 +254,10 @@ function getUsageHistoryData() {
 }
 
 function getEventListData() {
-  const masterSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(MASTER_SHEET_NAME);
-  if (!masterSheet) return [];
+  const eventListSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName('催事一覧');
+  if (!eventListSheet) return [];
   
-  const data = masterSheet.getDataRange().getValues();
+  const data = eventListSheet.getDataRange().getValues();
   if (data.length <= 1) return [];
   
   const headers = data.shift();
