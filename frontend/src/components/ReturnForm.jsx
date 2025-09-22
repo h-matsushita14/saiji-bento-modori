@@ -220,7 +220,7 @@ function ReturnForm() {
   };
 
   return (
-    <Box sx={{ mt: 4, pb: 10 }}>
+    <Box sx={{ mt: 4, pb: 15 }}>
       <Typography variant="h4" component="h2" gutterBottom>
         戻り記録
       </Typography>

@@ -123,7 +123,8 @@ function addReturnRecord(data) {
   const masterSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(MASTER_SHEET_NAME);
   if (!masterSheet) throw new Error('「催事戻り管理マスター」シートが見つかりません。');
   const { '戻り記録日': returnDate, '催事名': eventName, '商品名': productName, '数量': quantity, '重さ': weight } = data;
-  masterSheet.appendRow([returnDate, eventName, productName, quantity, '', weight]);
+  // ユーザー提示の列順: 戻り記録日, 催事名, 商品名, 重さ, 数量, 管理No., 在庫
+  masterSheet.appendRow([returnDate, eventName, productName, weight || '', quantity, '', '']);
 }
 
 function addUsageRecord(data) {
