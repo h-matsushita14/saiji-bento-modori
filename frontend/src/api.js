@@ -71,3 +71,7 @@ export const fetchReturnRecords = async () => {
   const result = await apiCall(`${API_ENDPOINT}?action=getReturnRecords`, {}, "Error fetching return records");
   return result.data;
 };
+
+export const addEventName = async (eventName) => {
+  return postData({ type: 'event', action: 'add', data: { eventName } }, "Error adding event name");
+};

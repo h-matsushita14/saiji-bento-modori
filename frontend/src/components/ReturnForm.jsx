@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { addReturnRecord } from '../api';
+import { addReturnRecord, addEventName } from '../api';
 import useFormValidation from '../hooks/useFormValidation';
-import { useData } from '../contexts/DataContext'; // 追加
+import { useData } from '../contexts/DataContext';
 
 // MUI Components
 import Box from '@mui/material/Box';
@@ -30,18 +30,27 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import Autocomplete from '@mui/material/Autocomplete'; // 追加
+import Autocomplete from '@mui/material/Autocomplete';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 function ReturnForm() {
-  const { products, eventList, reloadData } = useData(); // reloadDataを追加
-  console.log('Event List in ReturnForm:', eventList); // デバッグログ
+  const { products, eventList, reloadData } = useData();
   const [loading, setLoading] = useState(false);
   const [productFormValues, setProductFormValues] = useState({});
+
+  // 新規催事名追加ダイアログ用のstate
+  const [open, setOpen] = useState(false);
+  const [newEventName, setNewEventName] = useState('');
+  const [dialogLoading, setDialogLoading] = useState(false);
+  const [dialogError, setDialogError] = useState('');
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // 今日の日付を取得
   const getToday = () => {
     const today = new Date();
     return {
@@ -78,7 +87,6 @@ function ReturnForm() {
     resetForm,
   } = useFormValidation(initialState, validationRules);
 
-  // Contextから取得した商品リストに基づいてフォームの初期値を設定
   useEffect(() => {
     if (products.length > 0) {
       const initialProductValues = {};
@@ -89,7 +97,6 @@ function ReturnForm() {
     }
   }, [products]);
 
-  // 各商品の数量・重さ変更時のハンドラ
   const handleProductValueChange = (productId, rowId, field, value) => {
     setProductFormValues(prev => ({
       ...prev,
@@ -99,7 +106,6 @@ function ReturnForm() {
     }));
   };
 
-  // 行追加ハンドラ
   const handleAddRow = (productId) => {
     setProductFormValues(prev => ({
       ...prev,
@@ -110,12 +116,40 @@ function ReturnForm() {
     }));
   };
 
-  // 行削除ハンドラ
   const handleRemoveRow = (productId, rowId) => {
     setProductFormValues(prev => ({
       ...prev,
       [productId]: prev[productId].filter(row => row.id !== rowId),
     }));
+  };
+
+  const handleOpenDialog = () => {
+    setOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpen(false);
+    setNewEventName('');
+    setDialogError('');
+  };
+
+  const handleAddNewEvent = async () => {
+    if (!newEventName.trim()) {
+      setDialogError('催事名を入力してください。');
+      return;
+    }
+    setDialogLoading(true);
+    setDialogError('');
+    try {
+      await addEventName(newEventName);
+      handleCloseDialog();
+      await reloadData();
+      handleChange({ target: { name: '催事名', value: newEventName } });
+    } catch (err) {
+      setDialogError(err.message || '登録に失敗しました。');
+    } finally {
+      setDialogLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -163,21 +197,18 @@ function ReturnForm() {
         return;
       }
 
-      // 各商品を個別に登録
       for (const record of recordsToSubmit) {
         await addReturnRecord(record);
       }
 
       setMessage('戻り記録が正常に追加されました。');
       resetForm();
-      // 各商品のフォーム値をリセット
       const resetProductValues = {};
       products.forEach(product => {
         resetProductValues[product.id] = [{ id: 1, 数量: '', 重さ整数: '0', 重さ小数: '0' }];
       });
       setProductFormValues(resetProductValues);
 
-      // データを再読み込み
       await reloadData();
 
     } catch (err) {
@@ -264,25 +295,34 @@ function ReturnForm() {
         </Box>
         
         <Box sx={{ mb: 3 }}>
-          <Autocomplete
-            options={eventList}
-            value={formData.催事名}
-            onChange={(event, newValue) => {
-              handleChange({ target: { name: '催事名', value: newValue || '' } });
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                fullWidth
-                label="催事名"
-                name="催事名"
-                required
-                error={!!errors.催事名}
-                helperText={errors.催事名}
-                disabled={loading}
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs>
+              <Autocomplete
+                options={eventList}
+                value={formData.催事名}
+                onChange={(event, newValue) => {
+                  handleChange({ target: { name: '催事名', value: newValue || '' } });
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    label="催事名"
+                    name="催事名"
+                    required
+                    error={!!errors.催事名}
+                    helperText={errors.催事名}
+                    disabled={loading}
+                  />
+                )}
               />
-            )}
-          />
+            </Grid>
+            <Grid item>
+              <Button variant="contained" onClick={handleOpenDialog} disabled={loading}>
+                新規追加
+              </Button>
+            </Grid>
+          </Grid>
         </Box>
 
         <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
@@ -290,7 +330,7 @@ function ReturnForm() {
         </Typography>
         {products.length === 0 ? (
           <Alert severity="info">登録されている商品がありません。取扱商品ページから商品を登録してください。</Alert>
-        ) : isMobile ? ( // モバイル表示の場合
+        ) : isMobile ? (
           <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
             <Table aria-label="商品戻り記録テーブル">
               <TableHead>
@@ -397,7 +437,7 @@ function ReturnForm() {
               </TableBody>
             </Table>
           </TableContainer>
-        ) : ( // PC表示の場合
+        ) : (
           <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
             <Table aria-label="商品戻り記録テーブル">
               <TableHead>
@@ -422,15 +462,12 @@ function ReturnForm() {
                       <TableCell>
                         {product['重さ入力'] === '有' ? (
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            {/* 整数部のドロップダウン */}
                             <FormControl size="small" sx={{ width: 60 }} disabled={loading}>
-                              {/* <InputLabel>整数</InputLabel> Removed as per user request */}
                               <Select
                                 value={row.重さ整数 || ''}
                                 onChange={(e) => handleProductValueChange(product.id, row.id, '重さ整数', e.target.value)}
-                                displayEmpty // Add displayEmpty prop
+                                displayEmpty
                               >
-                                
                                 {Array.from({ length: 10 }, (_, i) => (
                                   <MenuItem key={i} value={i}>
                                     {i}
@@ -439,15 +476,12 @@ function ReturnForm() {
                               </Select>
                             </FormControl>
                             <Typography variant="body1">.</Typography>
-                            {/* 小数部のドロップダウン */}
                             <FormControl size="small" sx={{ width: 60 }} disabled={loading}>
-                              {/* <InputLabel>小数</InputLabel> Removed as per user request */}
                               <Select
                                 value={row.重さ小数 || ''}
                                 onChange={(e) => handleProductValueChange(product.id, row.id, '重さ小数', e.target.value)}
-                                displayEmpty // Add displayEmpty prop
+                                displayEmpty
                               >
-                                
                                 {Array.from({ length: 10 }, (_, i) => (
                                   <MenuItem key={i} value={i}>
                                     {i}
@@ -513,7 +547,6 @@ function ReturnForm() {
           </TableContainer>
         )}
         
-        {/* 固定フッターの記録ボタン */}
         <Box sx={{
           position: 'fixed',
           bottom: 0,
@@ -531,6 +564,35 @@ function ReturnForm() {
           </Button>
         </Box>
       </form>
+
+      <Dialog open={open} onClose={handleCloseDialog}>
+        <DialogTitle>新しい催事名を追加</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            マスターリストに新しい催事名を追加します。
+          </DialogContentText>
+          {dialogError && <Alert severity="error" sx={{ mt: 2 }}>{dialogError}</Alert>}
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="催事名"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={newEventName}
+            onChange={(e) => setNewEventName(e.target.value)}
+            disabled={dialogLoading}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} disabled={dialogLoading}>キャンセル</Button>
+          <Button onClick={handleAddNewEvent} disabled={dialogLoading}>
+            {dialogLoading ? <CircularProgress size={24} /> : '登録'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </Box>
   );
 }

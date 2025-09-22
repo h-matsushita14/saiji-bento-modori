@@ -2,6 +2,7 @@ const SPREADSHEET_ID = '1TvPA6MZBluP8a9AaATKbHJdHd8X_OIfgKi8e0Ga6MQ8';
 const MASTER_SHEET_NAME = '催事戻り管理マスター';
 const USAGE_SHEET_NAME = '使用数';
 const PRODUCT_SHEET_NAME = '商品'; // 追加
+const EVENT_LIST_SHEET_NAME = '催事一覧';
 
 /**
  * CORSプリフライトリクエスト (OPTIONS) に対応します。
@@ -101,6 +102,9 @@ function doPost(e) {
       } else {
         throw new Error('無効な商品リクエストアクションです。');
       }
+    } else if (type === 'event' && action === 'add') {
+      addEventName(data);
+      message = '新しい催事名が追加されました。';
     } else {
       throw new Error('無効なリクエストタイプです。');
     }
@@ -127,6 +131,29 @@ function addUsageRecord(data) {
   if (!usageSheet) throw new Error('「使用数」シートが見つかりません。');
   const { '管理No.': managementNo, '使用日': usageDate, '使用数': usageQuantity } = data;
   usageSheet.appendRow([managementNo, usageDate, usageQuantity]);
+}
+
+function addEventName(data) {
+  const eventListSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(EVENT_LIST_SHEET_NAME);
+  if (!eventListSheet) throw new Error(`「${EVENT_LIST_SHEET_NAME}」シートが見つかりません。`);
+  
+  const { eventName } = data;
+  if (!eventName || eventName.trim() === '') {
+    throw new Error('催事名が空です。');
+  }
+  
+  const trimmedEventName = eventName.trim();
+
+  // 既存の催事名と重複チェック
+  const lastRow = eventListSheet.getLastRow();
+  if (lastRow > 1) {
+    const existingNames = eventListSheet.getRange(`A2:A${lastRow}`).getValues().flat();
+    if (existingNames.includes(trimmedEventName)) {
+      throw new Error('その催事名は既に追加されています。');
+    }
+  }
+
+  eventListSheet.appendRow([trimmedEventName]);
 }
 
 /**
