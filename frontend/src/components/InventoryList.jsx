@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useData } from '../contexts/DataContext'; // 変更
+import { useData } from '../contexts/DataContext';
 
 // MUI Components
 import Box from '@mui/material/Box';
@@ -12,11 +12,11 @@ import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import Button from '@mui/material/Button';
 
 // 在庫計算ロジック
 const calculateInventory = (returnRecords, usageHistory) => {
@@ -30,8 +30,17 @@ const calculateInventory = (returnRecords, usageHistory) => {
     const quantity = Number(record['数量']) || 0;
     const productName = record['商品名'];
 
+    const returnDate = record['戻り記録日'];
+    const eventName = record['催事名'];
+
     if (!inventoryMap.has(managementNo)) {
-      inventoryMap.set(managementNo, { '商品名': productName, '在庫': 0, '管理No.': managementNo });
+      inventoryMap.set(managementNo, {
+        '商品名': productName,
+        '在庫': 0,
+        '管理No.': managementNo,
+        '戻り記録日': returnDate,
+        '催事名': eventName
+      });
     }
     inventoryMap.get(managementNo)['在庫'] += quantity;
   });
@@ -56,7 +65,7 @@ function InventoryList() {
   const [inventory, setInventory] = useState([]);
 
   const theme = useTheme();
-  const isMobileOrTablet = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     // Contextのデータが変更されたら在庫を再計算
@@ -73,51 +82,57 @@ function InventoryList() {
       </Typography>
       {inventory.length === 0 ? (
         <Alert severity="info">在庫データがありません。</Alert>
-      ) : isMobileOrTablet ? ( // スマホ・タブレット表示の場合
-        <Grid container spacing={2} alignItems="stretch">
-          {inventory.map((item, index) => (
-            <Grid item xs={12} key={index}>
-              <Card sx={{
-                width: "100%",
-                height: '100%',
-                display: "flex",
-                flexDirection: "column",
-                flexGrow: 1,
-              }}>
-                <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-                  <Typography
-                    variant="h6"
-                    component="div"
-                    sx={{
-                      whiteSpace: 'normal',
-                      wordBreak: 'break-word',
-                      overflow: "hidden",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 1,
-                      WebkitBoxOrient: "vertical",
-                    }}
-                  >
-                    {item['商品名']}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                    管理No.: {item['管理No.']}
-                  </Typography>
-                  <Typography variant="body2" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                    在庫: {item['在庫']}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      ) : ( // PC表示の場合
+      ) : isMobile ? (
+        <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+          <Table aria-label="inventory table">
+            <TableHead>
+              <TableRow>
+                <TableCell>在庫情報</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {inventory.map((item, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Card sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
+                      <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                        <Typography variant="h6" component="div" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                          {item['商品名']}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          管理No.: {item['管理No.']}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          戻り記録日: {item['戻り記録日']}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          催事名: {item['催事名']}
+                        </Typography>
+                        <Typography variant="body1">
+                          在庫: {item['在庫']}
+                        </Typography>
+                        <Box sx={{ mt: 1, width: '100%' }}>
+                          <Button variant="contained" size="small" fullWidth>この在庫を使用する</Button>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      ) : (
         <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
           <Table aria-label="inventory table">
             <TableHead>
               <TableRow>
                 <TableCell>管理No.</TableCell>
+                <TableCell>戻り記録日</TableCell>
+                <TableCell>催事名</TableCell>
                 <TableCell>商品名</TableCell>
                 <TableCell>在庫</TableCell>
+                <TableCell></TableCell> {/* ボタン用のセル */}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -129,8 +144,13 @@ function InventoryList() {
                   <TableCell component="th" scope="row">
                     {item['管理No.']}
                   </TableCell>
+                  <TableCell>{item['戻り記録日']}</TableCell>
+                  <TableCell>{item['催事名']}</TableCell>
                   <TableCell>{item['商品名']}</TableCell>
                   <TableCell>{item['在庫']}</TableCell>
+                  <TableCell>
+                    <Button variant="contained" size="small">この在庫を使用する</Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
