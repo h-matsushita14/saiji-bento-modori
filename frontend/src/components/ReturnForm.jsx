@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { addReturnRecord, addEventName } from '../api';
+import { addReturnRecords, addEventName } from '../api';
 import useFormValidation from '../hooks/useFormValidation';
 import { useData } from '../contexts/DataContext';
 
