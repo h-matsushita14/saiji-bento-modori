@@ -273,6 +273,16 @@ function InventoryList() {
               ))}
             </Select>
           </FormControl>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+            <Button 
+              variant="outlined" 
+              size="small"
+              onClick={() => setUsageQuantity(selectedInventoryItem ? selectedInventoryItem['在庫'] : 0)}
+              disabled={!selectedInventoryItem}
+            >
+              全て使用
+            </Button>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseUsageDialog}>キャンセル</Button>
