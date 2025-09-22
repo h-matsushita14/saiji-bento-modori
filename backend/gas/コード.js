@@ -293,6 +293,7 @@ function getUsageHistoryData() {
   const usageData = usageSheet.getDataRange().getValues();
   if (usageData.length <= 1) return [];
   const usageHeaders = usageData.shift();
+  const usageDateIndex = usageHeaders.indexOf('使用日');
 
   const masterSheet = spreadsheet.getSheetByName(MASTER_SHEET_NAME);
   if (!masterSheet) return [];
@@ -316,7 +317,11 @@ function getUsageHistoryData() {
   const history = usageData.map(row => {
     const record = {};
     usageHeaders.forEach((header, i) => {
-      record[header] = row[i];
+      if (i === usageDateIndex && row[i] instanceof Date) {
+        record[header] = Utilities.formatDate(row[i], "Asia/Tokyo", "yyyy-MM-dd");
+      } else {
+        record[header] = row[i];
+      }
     });
     record['商品名'] = productMap.get(record['管理No.']) || '不明';
     return record;
@@ -351,11 +356,16 @@ function getReturnRecordsData() {
   if (data.length <= 1) return [];
   
   const headers = data.shift();
-  
+  const returnDateIndex = headers.indexOf('戻り記録日');
+
   const records = data.map(row => {
     const record = {};
     headers.forEach((header, i) => {
-      record[header] = row[i];
+      if (i === returnDateIndex && row[i] instanceof Date) {
+        record[header] = Utilities.formatDate(row[i], "Asia/Tokyo", "yyyy-MM-dd");
+      } else {
+        record[header] = row[i];
+      }
     });
     return record;
   });
