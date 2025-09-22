@@ -296,7 +296,7 @@ function ReturnForm() {
         
         <Box sx={{ mb: 3 }}>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs>
+            <Grid item xs={8} sm={9}>
               <Autocomplete
                 options={eventList}
                 value={formData.催事名}
@@ -317,8 +317,8 @@ function ReturnForm() {
                 )}
               />
             </Grid>
-            <Grid item>
-              <Button variant="contained" onClick={handleOpenDialog} disabled={loading}>
+            <Grid item xs={4} sm={3}>
+              <Button variant="contained" onClick={handleOpenDialog} disabled={loading} fullWidth>
                 新規追加
               </Button>
             </Grid>
