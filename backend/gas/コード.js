@@ -83,8 +83,8 @@ function doPost(e) {
 
     let message = '';
 
-    if (type === 'return') {
-      addReturnRecord(data);
+    if (type === 'returns') {
+      addReturnRecords(data);
       message = '戻り記録が追加されました。';
     } else if (type === 'usage') {
       addUsageRecord(data);
@@ -119,12 +119,53 @@ function doPost(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-function addReturnRecord(data) {
+function addReturnRecords(records) { // records は配列
+  if (!records || records.length === 0) {
+    return;
+  }
+
   const masterSheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(MASTER_SHEET_NAME);
   if (!masterSheet) throw new Error('「催事戻り管理マスター」シートが見つかりません。');
-  const { '戻り記録日': returnDate, '催事名': eventName, '商品名': productName, '数量': quantity, '重さ': weight } = data;
-  // ユーザー提示の列順: 戻り記録日, 催事名, 商品名, 重さ, 数量, 管理No., 在庫
-  masterSheet.appendRow([returnDate, eventName, productName, weight || '', quantity, '', '']);
+
+  // --- 共通の管理No.プレフィックスと現在の最大通し番号を取得 ---
+  const firstRecord = records[0];
+  const returnDate = firstRecord['戻り記録日'];
+  const date = new Date(returnDate);
+  const year = date.getFullYear().toString().slice(-2);
+  const month = ('0' + (date.getMonth() + 1)).slice(-2);
+  const day = ('0' + date.getDate()).slice(-2);
+  const datePrefix = year + month + day;
+
+  const allData = masterSheet.getDataRange().getValues();
+  const headers = allData.length > 0 ? allData.shift() : [];
+  const managementNoIndex = headers.indexOf('管理No.');
+
+  if (managementNoIndex === -1) {
+    throw new Error('「管理No.」列が見つかりません。');
+  }
+
+  const serials = allData
+    .map(row => row[managementNoIndex])
+    .filter(managementNo => managementNo && typeof managementNo.startsWith === 'function' && managementNo.startsWith(datePrefix))
+    .map(managementNo => parseInt(managementNo.slice(-2), 10));
+  
+  let currentMaxSerial = serials.length > 0 ? Math.max(...serials) : 0;
+  // --- 取得ここまで ---
+
+  const newRows = records.map(record => {
+    currentMaxSerial++; // 通し番号をインクリメント
+    const newSerial = ('0' + currentMaxSerial).slice(-2);
+    const newManagementNo = datePrefix + newSerial;
+
+    const { '戻り記録日': rec_returnDate, '催事名': eventName, '商品名': productName, '数量': quantity, '重さ': weight } = record;
+    
+    // 戻り記録日, 催事名, 商品名, 重さ, 数量, 管理No., 在庫
+    return [rec_returnDate, eventName, productName, weight || '', quantity, newManagementNo, ''];
+  });
+
+  if (newRows.length > 0) {
+    masterSheet.getRange(masterSheet.getLastRow() + 1, 1, newRows.length, newRows[0].length).setValues(newRows);
+  }
 }
 
 function addUsageRecord(data) {

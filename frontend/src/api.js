@@ -32,8 +32,8 @@ const postData = async (data, errorMessagePrefix) => {
   }, errorMessagePrefix);
 };
 
-export const addReturnRecord = async (data) => {
-  return postData({ type: 'return', data }, "Error adding return record");
+export const addReturnRecords = async (records) => {
+  return postData({ type: 'returns', data: records }, "Error adding return records");
 };
 
 export const addUsageRecord = async (data) => {

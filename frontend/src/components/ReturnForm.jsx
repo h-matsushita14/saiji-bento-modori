@@ -197,9 +197,7 @@ function ReturnForm() {
         return;
       }
 
-      for (const record of recordsToSubmit) {
-        await addReturnRecord(record);
-      }
+      await addReturnRecords(recordsToSubmit);
 
       setMessage('戻り記録が正常に追加されました。');
       resetForm();
