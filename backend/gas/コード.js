@@ -109,6 +109,9 @@ function doPost(e) {
       throw new Error('無効なリクエストタイプです。');
     }
     
+    // データ更新後、在庫列を再計算して更新
+    updateInventoryOnSheet();
+
     response = { status: 'success', message: message };
 
   } catch (error) {
@@ -358,4 +361,60 @@ function getReturnRecordsData() {
   });
   
   return records;
+}
+
+/**
+ * '催事戻り管理マスター'シートの在庫列を計算し更新します。
+ */
+function updateInventoryOnSheet() {
+  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const masterSheet = spreadsheet.getSheetByName(MASTER_SHEET_NAME);
+  const usageSheet = spreadsheet.getSheetByName(USAGE_SHEET_NAME);
+
+  if (!masterSheet || !usageSheet) {
+    throw new Error('必要なシートが見つかりません。');
+  }
+
+  // 1. 使用数シートから管理No.ごとの使用数合計を計算
+  const usageData = usageSheet.getDataRange().getValues();
+  const usageHeaders = usageData.shift(); // ヘッダー行
+  const usageManagementNoIndex = usageHeaders.indexOf('管理No.');
+  const usageQuantityIndex = usageHeaders.indexOf('使用数');
+
+  const usageMap = new Map();
+  if (usageManagementNoIndex !== -1 && usageQuantityIndex !== -1) {
+    usageData.forEach(row => {
+      const managementNo = row[usageManagementNoIndex];
+      const usageQuantity = Number(row[usageQuantityIndex]) || 0;
+      if (managementNo) {
+        usageMap.set(managementNo, (usageMap.get(managementNo) || 0) + usageQuantity);
+      }
+    });
+  }
+
+  // 2. マスターシートの在庫を更新
+  const masterDataRange = masterSheet.getRange(2, 1, masterSheet.getLastRow() - 1, masterSheet.getLastColumn());
+  const masterData = masterDataRange.getValues();
+  
+  const masterHeaders = masterSheet.getRange(1, 1, 1, masterSheet.getLastColumn()).getValues()[0];
+  const masterManagementNoIndex = masterHeaders.indexOf('管理No.');
+  const masterQuantityIndex = masterHeaders.indexOf('数量');
+  const masterInventoryIndex = masterHeaders.indexOf('在庫');
+
+  if (masterManagementNoIndex === -1 || masterQuantityIndex === -1 || masterInventoryIndex === -1) {
+    throw new Error('マスターシートに必要な列（管理No., 数量, 在庫）が見つかりません。');
+  }
+  
+  const inventoryColumnUpdates = masterData.map(row => {
+    const managementNo = row[masterManagementNoIndex];
+    const initialQuantity = Number(row[masterQuantityIndex]) || 0;
+    const totalUsage = usageMap.get(managementNo) || 0;
+    const currentInventory = initialQuantity - totalUsage;
+    return [currentInventory]; // 在庫列の値のみを配列として返す
+  });
+
+  // 3. 在庫列のみを更新
+  if (inventoryColumnUpdates.length > 0) {
+    masterSheet.getRange(2, masterInventoryIndex + 1, inventoryColumnUpdates.length, 1).setValues(inventoryColumnUpdates);
+  }
 }
