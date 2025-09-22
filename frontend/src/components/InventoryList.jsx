@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
-import { addUsageRecord } from '../api';
+import { styled } from '@mui/material/styles';
 
 // MUI Components
 import Box from '@mui/material/Box';
@@ -27,62 +27,36 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import Badge from '@mui/material/Badge';
 
-
-// 在庫計算ロジック
-const calculateInventory = (returnRecords, usageHistory) => {
-  const inventoryMap = new Map();
-
-  // 戻り記録から在庫を積み上げ
-  returnRecords.forEach(record => {
-    const managementNo = record['管理No.'];
-    if (!managementNo) return;
-
-    const quantity = Number(record['数量']) || 0;
-    const productName = record['商品名'];
-
-    const returnDate = record['戻り記録日'];
-    const eventName = record['催事名'];
-    const weight = Number(record['重さ']) || 0; // 重さを追加
-
-    if (!inventoryMap.has(managementNo)) {
-      inventoryMap.set(managementNo, {
-        '商品名': productName,
-        '在庫': 0,
-        '管理No.': managementNo,
-        '戻り記録日': returnDate,
-        '催事名': eventName,
-        '重さ': 0 // 初期値を0に設定
-      });
-    }
-    inventoryMap.get(managementNo)['在庫'] += quantity;
-    inventoryMap.get(managementNo)['重さ'] += weight; // 重さを合計
-  });
-
-  // 使用履歴から在庫を減算
-  usageHistory.forEach(record => {
-    const managementNo = record['管理No.'];
-    if (!managementNo) return;
-
-    const usageQuantity = Number(record['使用数']) || 0;
-
-    if (inventoryMap.has(managementNo)) {
-      inventoryMap.get(managementNo)['在庫'] -= usageQuantity;
-    }
-  });
-
-  return Array.from(inventoryMap.values());
-};
+// ヘッダーのスタイル
+const StickyHeader = styled(Box)(({ theme }) => ({
+  position: 'sticky',
+  top: 0,
+  backgroundColor: theme.palette.background.paper,
+  padding: theme.spacing(2),
+  zIndex: 1100, // AppBarより手前に来るように
+  borderBottom: `1px solid ${theme.palette.divider}`,
+}));
 
 const formatDate = (dateString) => {
   if (!dateString) return '';
-  const [year, month, day] = dateString.split('-');
+  const date = new Date(dateString);
+  // タイムゾーンオフセットを考慮して日付を補正
+  const offset = date.getTimezoneOffset();
+  const correctedDate = new Date(date.getTime() - (offset * 60 * 1000));
+  const [year, month, day] = correctedDate.toISOString().split('T')[0].split('-');
   return `${year}年${parseInt(month, 10)}月${parseInt(day, 10)}日`;
 };
 
 function InventoryList() {
-  const { returnRecords, usageHistory, reloadData } = useData(); // Contextからデータを取得
-  const [inventory, setInventory] = useState([]);
+  // DataContextから状態と関数を取得
+  const { 
+    inventory,
+    pendingUsages,
+    addPendingUsage,
+    submitPendingUsages
+  } = useData();
 
   const [openUsageDialog, setOpenUsageDialog] = useState(false);
   const [selectedInventoryItem, setSelectedInventoryItem] = useState(null);
@@ -93,13 +67,22 @@ function InventoryList() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  // 離脱防止機能
   useEffect(() => {
-    // Contextのデータが変更されたら在庫を再計算
-    if (returnRecords.length > 0 || usageHistory.length > 0) {
-      const calculatedInventory = calculateInventory(returnRecords, usageHistory);
-      setInventory(calculatedInventory);
-    }
-  }, [returnRecords, usageHistory]);
+    const handleBeforeUnload = (e) => {
+      if (pendingUsages.length > 0) {
+        e.preventDefault();
+        e.returnValue = '使用数の登録はまだ完了していません。送信ボタンを押してください。';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [pendingUsages.length]);
+
 
   const getTodayDateString = () => {
     const today = new Date();
@@ -111,8 +94,9 @@ function InventoryList() {
 
   const handleOpenUsageDialog = (item) => {
     setSelectedInventoryItem(item);
-    setUsageDate(getTodayDateString()); // デフォルトで今日の日付を設定
-    setUsageQuantity(0); // デフォルトで使用数を0に設定
+    setUsageDate(getTodayDateString());
+    setUsageQuantity(0);
+    setUsageError('');
     setOpenUsageDialog(true);
   };
 
@@ -121,10 +105,11 @@ function InventoryList() {
     setSelectedInventoryItem(null);
     setUsageDate('');
     setUsageQuantity(0);
-    setUsageError(''); // エラーメッセージをクリア
+    setUsageError('');
   };
 
-  const handleRegisterUsage = async () => {
+  // 「登録」ボタンの処理を一時保存に変更
+  const handleRegisterUsage = () => {
     if (!selectedInventoryItem || usageQuantity === 0) {
       setUsageError('使用する在庫アイテムを選択し、使用数を入力してください。');
       return;
@@ -134,32 +119,41 @@ function InventoryList() {
       return;
     }
 
-    setUsageError(''); // エラーメッセージをクリア
-
-    try {
-      const usageData = {
-        '管理No.': selectedInventoryItem['管理No.'],
-        '使用日': usageDate,
-        '使用数': usageQuantity,
-      };
-      await addUsageRecord(usageData);
-      handleCloseUsageDialog();
-      await reloadData(); // 在庫データを再読み込み
-      // 成功メッセージの表示など
-    } catch (error) {
-      setUsageError(`使用記録の登録に失敗しました: ${error.message}`);
-    }
+    const usageData = {
+      '管理No.': selectedInventoryItem['管理No.'],
+      '使用日': usageDate,
+      '使用数': usageQuantity,
+    };
+    
+    addPendingUsage(usageData); // API送信の代わりに一時保存用の関数を呼び出す
+    handleCloseUsageDialog();
   };
 
   return (
     <>
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h4" component="h2" gutterBottom>
-          在庫一覧
-        </Typography>
+      <StickyHeader>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h4" component="h2">
+            在庫一覧
+          </Typography>
+          <Button 
+            variant="contained" 
+            color="primary"
+            onClick={submitPendingUsages}
+            disabled={pendingUsages.length === 0}
+          >
+            <Badge badgeContent={pendingUsages.length} color="error" sx={{ mr: 2 }}>
+              登録した使用数の送信
+            </Badge>
+          </Button>
+        </Box>
+      </StickyHeader>
+
+      <Box sx={{ p: 2 }}>
         {inventory.length === 0 ? (
           <Alert severity="info">在庫データがありません。</Alert>
         ) : isMobile ? (
+          // モバイル表示
           <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
             <Table aria-label="inventory table">
               <TableHead>
@@ -168,29 +162,17 @@ function InventoryList() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {inventory.map((item, index) => (
+                {inventory.filter(item => item['在庫'] > 0).map((item, index) => (
                   <TableRow key={index}>
                     <TableCell>
-                      <Card sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
-                        <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-                          <Typography variant="h6" component="div" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                            {item['商品名']}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            管理No.: {item['管理No.']}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            戻り記録日: {formatDate(item['戻り記録日'])}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            催事名: {item['催事名']}
-                          </Typography>
-                          <Typography variant="body1">
-                            在庫: {item['在庫']}
-                          </Typography>
-                          <Typography variant="body1">
-                            重さ: {item['重さ'] ? `${item['重さ']}kg` : '-'}
-                          </Typography>
+                      <Card sx={{ width: "100%" }}>
+                        <CardContent>
+                          <Typography variant="h6" component="div">{item['商品名']}</Typography>
+                          <Typography variant="body2" color="text.secondary">管理No.: {item['管理No.']}</Typography>
+                          <Typography variant="body2" color="text.secondary">戻り記録日: {formatDate(item['戻り記録日'])}</Typography>
+                          <Typography variant="body2" color="text.secondary">催事名: {item['催事名']}</Typography>
+                          <Typography variant="body1">在庫: {item['在庫']}</Typography>
+                          <Typography variant="body1">重さ: {item['重さ'] ? `${item['重さ']}kg` : '-'}</Typography>
                           <Box sx={{ mt: 1, width: '100%' }}>
                             <Button variant="contained" size="small" fullWidth onClick={() => handleOpenUsageDialog(item)}>この在庫を使用する</Button>
                           </Box>
@@ -203,6 +185,7 @@ function InventoryList() {
             </Table>
           </TableContainer>
         ) : (
+          // PC表示
           <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
             <Table aria-label="inventory table">
               <TableHead>
@@ -212,24 +195,19 @@ function InventoryList() {
                   <TableCell>催事名</TableCell>
                   <TableCell>商品名</TableCell>
                   <TableCell>在庫</TableCell>
-                  <TableCell>重さ</TableCell> {/* 重さを追加 */}
-                  <TableCell></TableCell> {/* ボタン用のセル */}
+                  <TableCell>重さ</TableCell>
+                  <TableCell></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {inventory.map((item, index) => (
-                  <TableRow
-                    key={index}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  >
-                    <TableCell component="th" scope="row">
-                      {item['管理No.']}
-                    </TableCell>
+                {inventory.filter(item => item['在庫'] > 0).map((item, index) => (
+                  <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                    <TableCell component="th" scope="row">{item['管理No.']}</TableCell>
                     <TableCell>{formatDate(item['戻り記録日'])}</TableCell>
                     <TableCell>{item['催事名']}</TableCell>
                     <TableCell>{item['商品名']}</TableCell>
                     <TableCell>{item['在庫']}</TableCell>
-                    <TableCell>{item['重さ'] ? `${item['重さ']}kg` : '-'}</TableCell> {/* 重さを表示 */}
+                    <TableCell>{item['重さ'] ? `${item['重さ']}kg` : '-'}</TableCell>
                     <TableCell>
                       <Button variant="contained" size="small" onClick={() => handleOpenUsageDialog(item)}>この在庫を使用する</Button>
                     </TableCell>
@@ -256,9 +234,7 @@ function InventoryList() {
             fullWidth
             value={usageDate}
             onChange={(e) => setUsageDate(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
+            InputLabelProps={{ shrink: true }}
             sx={{ mb: 2 }}
           />
           <FormControl fullWidth sx={{ mb: 2 }}>
