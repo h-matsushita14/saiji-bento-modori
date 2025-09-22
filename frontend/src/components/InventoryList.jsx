@@ -18,6 +18,16 @@ import CardContent from '@mui/material/CardContent';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import TextField from '@mui/material/TextField';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+
 
 // 在庫計算ロジック
 const calculateInventory = (returnRecords, usageHistory) => {
@@ -71,7 +81,7 @@ const formatDate = (dateString) => {
 };
 
 function InventoryList() {
-  const { returnRecords, usageHistory } = useData(); // Contextからデータを取得
+  const { returnRecords, usageHistory, reloadData } = useData(); // Contextからデータを取得
   const [inventory, setInventory] = useState([]);
 
   const [openUsageDialog, setOpenUsageDialog] = useState(false);
