@@ -152,133 +152,134 @@ function InventoryList() {
   };
 
   return (
-    <Box sx={{ mt: 4 }}>
-      <Typography variant="h4" component="h2" gutterBottom>
-        在庫一覧
-      </Typography>
-      {inventory.length === 0 ? (
-        <Alert severity="info">在庫データがありません。</Alert>
-      ) : isMobile ? (
-        <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
-          <Table aria-label="inventory table">
-            <TableHead>
-              <TableRow>
-                <TableCell>在庫情報</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {inventory.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <Card sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
-                      <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-                        <Typography variant="h6" component="div" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                          {item['商品名']}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          管理No.: {item['管理No.']}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          戻り記録日: {formatDate(item['戻り記録日'])}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          催事名: {item['催事名']}
-                        </Typography>
-                        <Typography variant="body1">
-                          在庫: {item['在庫']}
-                        </Typography>
-                        <Typography variant="body1">
-                          重さ: {item['重さ'] ? `${item['重さ']}kg` : '-'}
-                        </Typography>
-                        <Box sx={{ mt: 1, width: '100%' }}>
-                          <Button variant="contained" size="small" fullWidth onClick={() => handleOpenUsageDialog(item)}>この在庫を使用する</Button>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </TableCell>
+    <>
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h4" component="h2" gutterBottom>
+          在庫一覧
+        </Typography>
+        {inventory.length === 0 ? (
+          <Alert severity="info">在庫データがありません。</Alert>
+        ) : isMobile ? (
+          <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+            <Table aria-label="inventory table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>在庫情報</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      ) : (
-        <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
-          <Table aria-label="inventory table">
-            <TableHead>
-              <TableRow>
-                <TableCell>管理No.</TableCell>
-                <TableCell>戻り記録日</TableCell>
-                <TableCell>催事名</TableCell>
-                <TableCell>商品名</TableCell>
-                <TableCell>在庫</TableCell>
-                <TableCell>重さ</TableCell> {/* 重さを追加 */}
-                <TableCell></TableCell> {/* ボタン用のセル */}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {inventory.map((item, index) => (
-                <TableRow
-                  key={index}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {item['管理No.']}
-                  </TableCell>
-                  <TableCell>{formatDate(item['戻り記録日'])}</TableCell>
-                  <TableCell>{item['催事名']}</TableCell>
-                  <TableCell>{item['商品名']}</TableCell>
-                  <TableCell>{item['在庫']}</TableCell>
-                  <TableCell>{item['重さ'] ? `${item['重さ']}kg` : '-'}</TableCell> {/* 重さを表示 */}
-                  <TableCell>
-                    <Button variant="contained" size="small" onClick={() => handleOpenUsageDialog(item)}>この在庫を使用する</Button>
-                  </TableCell>
+              </TableHead>
+              <TableBody>
+                {inventory.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Card sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
+                        <CardContent sx={{ flexGrow: 1, p: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                          <Typography variant="h6" component="div" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                            {item['商品名']}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            管理No.: {item['管理No.']}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            戻り記録日: {formatDate(item['戻り記録日'])}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            催事名: {item['催事名']}
+                          </Typography>
+                          <Typography variant="body1">
+                            在庫: {item['在庫']}
+                          </Typography>
+                          <Typography variant="body1">
+                            重さ: {item['重さ'] ? `${item['重さ']}kg` : '-'}
+                          </Typography>
+                          <Box sx={{ mt: 1, width: '100%' }}>
+                            <Button variant="contained" size="small" fullWidth onClick={() => handleOpenUsageDialog(item)}>この在庫を使用する</Button>
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ) : (
+          <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+            <Table aria-label="inventory table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>管理No.</TableCell>
+                  <TableCell>戻り記録日</TableCell>
+                  <TableCell>催事名</TableCell>
+                  <TableCell>商品名</TableCell>
+                  <TableCell>在庫</TableCell>
+                  <TableCell>重さ</TableCell> {/* 重さを追加 */}
+                  <TableCell></TableCell> {/* ボタン用のセル */}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-    </Box>
-
-    <Dialog open={openUsageDialog} onClose={handleCloseUsageDialog}>
-      <DialogTitle>在庫を使用する</DialogTitle>
-      <DialogContent>
-        {usageError && <Alert severity="error" sx={{ mb: 2 }}>{usageError}</Alert>}
-        {selectedInventoryItem && (
-          <Typography variant="subtitle1" sx={{ mb: 2 }}>
-            商品名: {selectedInventoryItem['商品名']} (管理No.: {selectedInventoryItem['管理No.']})
-          </Typography>
+              </TableHead>
+              <TableBody>
+                {inventory.map((item, index) => (
+                  <TableRow
+                    key={index}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {item['管理No.']}
+                    </TableCell>
+                    <TableCell>{formatDate(item['戻り記録日'])}</TableCell>
+                    <TableCell>{item['催事名']}</TableCell>
+                    <TableCell>{item['商品名']}</TableCell>
+                    <TableCell>{item['在庫']}</TableCell>
+                    <TableCell>{item['重さ'] ? `${item['重さ']}kg` : '-'}</TableCell> {/* 重さを表示 */}
+                    <TableCell>
+                      <Button variant="contained" size="small" onClick={() => handleOpenUsageDialog(item)}>この在庫を使用する</Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
-        <TextField
-          label="使用日"
-          type="date"
-          fullWidth
-          value={usageDate}
-          onChange={(e) => setUsageDate(e.target.value)}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          sx={{ mb: 2 }}
-        />
-        <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel>使用数</InputLabel>
-          <Select
-            value={usageQuantity}
-            label="使用数"
-            onChange={(e) => setUsageQuantity(Number(e.target.value))}
-          >
-            {selectedInventoryItem && Array.from({ length: selectedInventoryItem['在庫'] + 1 }, (_, i) => (
-              <MenuItem key={i} value={i}>{i}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseUsageDialog}>キャンセル</Button>
-        <Button onClick={handleRegisterUsage} variant="contained">登録</Button>
-      </DialogActions>
-    </Dialog>
+      </Box>
 
+      <Dialog open={openUsageDialog} onClose={handleCloseUsageDialog}>
+        <DialogTitle>在庫を使用する</DialogTitle>
+        <DialogContent>
+          {usageError && <Alert severity="error" sx={{ mb: 2 }}>{usageError}</Alert>}
+          {selectedInventoryItem && (
+            <Typography variant="subtitle1" sx={{ mb: 2 }}>
+              商品名: {selectedInventoryItem['商品名']} (管理No.: {selectedInventoryItem['管理No.']})
+            </Typography>
+          )}
+          <TextField
+            label="使用日"
+            type="date"
+            fullWidth
+            value={usageDate}
+            onChange={(e) => setUsageDate(e.target.value)}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            sx={{ mb: 2 }}
+          />
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel>使用数</InputLabel>
+            <Select
+              value={usageQuantity}
+              label="使用数"
+              onChange={(e) => setUsageQuantity(Number(e.target.value))}
+            >
+              {selectedInventoryItem && Array.from({ length: selectedInventoryItem['在庫'] + 1 }, (_, i) => (
+                <MenuItem key={i} value={i}>{i}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseUsageDialog}>キャンセル</Button>
+          <Button onClick={handleRegisterUsage} variant="contained">登録</Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
 
