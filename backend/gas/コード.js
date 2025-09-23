@@ -143,9 +143,10 @@ function addReturnRecords(records) { // records は配列
     const day = ('0' + date.getDate()).slice(-2);
     const datePrefix = year + month + day;
 
-    const allData = masterSheet.getDataRange().getValues();
-    const headers = allData.length > 0 ? allData.shift() : [];
-    const managementNoIndex = headers.indexOf('管理No.');
+    // Read all data again to ensure it's fresh after acquiring the lock
+    const freshAllData = masterSheet.getDataRange().getValues();
+    const freshHeaders = freshAllData.length > 0 ? freshAllData.shift() : [];
+    const managementNoIndex = freshHeaders.indexOf('管理No.');
 
     if (managementNoIndex === -1) {
       throw new Error('「管理No.」列が見つかりません。');
@@ -154,8 +155,7 @@ function addReturnRecords(records) { // records は配列
     const existingManagementNos = new Set();
     let currentMaxSerial = 0;
 
-    // Populate existingManagementNos and find currentMaxSerial for the datePrefix
-    allData.forEach(row => {
+    freshAllData.forEach(row => {
       const managementNo = row[managementNoIndex];
       if (managementNo) {
         existingManagementNos.add(managementNo);
