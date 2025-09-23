@@ -17,6 +17,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -26,7 +27,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 
 function App() {
-  const { isLoading, progress } = useData(); // 追加
+  const { isLoading, progress, reloadData } = useData(); // 追加
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -93,6 +94,13 @@ function App() {
                 弁当催事戻り管理
               </Link>
             </Typography>
+            <IconButton
+              color="inherit"
+              aria-label="refresh data"
+              onClick={reloadData}
+            >
+              <RefreshIcon />
+            </IconButton>
             {!isMobile && (
               <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <Button color="inherit" component={Link} to="/inventory">在庫一覧</Button>
