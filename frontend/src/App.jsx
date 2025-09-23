@@ -71,7 +71,7 @@ function App() {
   return (
     <BrowserRouter>
       <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static">
+        <AppBar position="fixed">
           <Toolbar>
             {isMobile && (
               <IconButton
@@ -128,7 +128,7 @@ function App() {
           </Drawer>
         </nav>
 
-        <Container sx={{ mt: 4 }}>
+        <Container sx={{ mt: 4, pt: `calc(${theme.mixins.toolbar.minHeight}px + 16px)` }}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/inventory" element={<InventoryList />} />
