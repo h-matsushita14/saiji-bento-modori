@@ -28,7 +28,6 @@ function UsageHistory() {
       {usageHistory.length === 0 ? (
         <Alert severity="info">使用履歴がありません。</Alert>
       ) : ( // 常にカード表示
-              ) : (
         <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
           <Table aria-label="usage history table">
             <TableHead>
