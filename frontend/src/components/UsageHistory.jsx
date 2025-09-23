@@ -43,7 +43,7 @@ function UsageHistory() {
                       <Card sx={{ width: "100%" }}>
                         <CardContent>
                           <Typography variant="h6" component="div">{row.商品名}</Typography>
-                          <Typography variant="body2" color="text.secondary">管理No.: {row.管理No}</Typography>
+                          <Typography variant="body2" color="text.secondary">管理No.: {row['管理No.']}</Typography>
                           <Typography variant="body2" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
                             使用日: {new Date(row.使用日).toLocaleDateString()}
                           </Typography>
