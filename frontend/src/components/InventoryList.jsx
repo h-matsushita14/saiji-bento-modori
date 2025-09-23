@@ -294,8 +294,9 @@ function InventoryList() {
           color="primary"
           onClick={() => setOpenConfirmUsageDialog(true)}
           disabled={pendingUsages.length === 0}
+          sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.2, textAlign: 'center' }}
         >
-          使用数の 確認・修正
+          {'使用数の\n確認・修正'}
         </Button>
         <Button
           variant="contained"
@@ -375,19 +376,19 @@ function InventoryList() {
                       {`管理No.: ${usage['管理No.']} / ${new Date(usage['使用日']).toLocaleDateString()}`}
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1, width: '100%', justifyContent: 'flex-end' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1, width: '100%', justifyContent: 'flex-end' }}>
+                    <Typography variant="h6" component="div">
+                      {usage['使用数']}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                      {usage['単位'] || '個'}
+                    </Typography>
                     <IconButton size="small" onClick={() => handleDecreaseQuantity(usage)}>
                       <RemoveCircleOutlineIcon />
                     </IconButton>
-                    <Typography variant="h6" component="div" sx={{ minWidth: '2ch', textAlign: 'center' }}>
-                      {usage['使用数']}
-                    </Typography>
                     <IconButton size="small" onClick={() => handleIncreaseQuantity(usage)}>
                       <AddCircleOutlineIcon />
                     </IconButton>
-                    <Typography variant="body2" color="text.secondary" sx={{ width: '3em', textAlign: 'left', ml: 1 }}>
-                      {usage['単位'] || '個'}
-                    </Typography>
                     <IconButton size="small" onClick={() => handleRemoveUsage(usage)}>
                       <DeleteIcon />
                     </IconButton>
