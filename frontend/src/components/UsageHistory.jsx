@@ -77,19 +77,19 @@ function UsageHistory() {
           <Table aria-label="usage history table pc">
             <TableHead>
               <TableRow>
+                <TableCell>管理No.</TableCell>
                 <TableCell>使用日</TableCell>
                 <TableCell>商品名</TableCell>
                 <TableCell>使用数</TableCell>
-                <TableCell>管理No.</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {usageHistory.map((row, index) => (
                 <TableRow key={index}>
+                  <TableCell>{row['管理No.']}</TableCell>
                   <TableCell>{formatDate(row.使用日)}</TableCell>
                   <TableCell>{row.商品名}</TableCell>
                   <TableCell>{row.使用数} {productMap.get(row.商品名) || ''}</TableCell>
-                  <TableCell>{row['管理No.']}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

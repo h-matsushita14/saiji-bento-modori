@@ -295,7 +295,7 @@ function InventoryList() {
           onClick={() => setOpenConfirmUsageDialog(true)}
           disabled={pendingUsages.length === 0}
         >
-          使用数の確認・修正
+          使用数の 確認・修正
         </Button>
         <Button
           variant="contained"
@@ -366,33 +366,31 @@ function InventoryList() {
           ) : (
             <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
               {pendingUsages.map((usage, index) => (
-                <ListItem key={index} divider>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', py: 1 }}>
-                    <Box sx={{ flexGrow: 1 }}>
-                      <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                        {usage['商品名']}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {`管理No.: ${usage['管理No.']} / ${new Date(usage['使用日']).toLocaleDateString()}`}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 1 }}>
-                      <IconButton size="small" onClick={() => handleDecreaseQuantity(usage)}>
-                        <RemoveCircleOutlineIcon />
-                      </IconButton>
-                      <Typography variant="h6" component="div" sx={{ minWidth: '2ch', textAlign: 'center' }}>
-                        {usage['使用数']}
-                      </Typography>
-                      <IconButton size="small" onClick={() => handleIncreaseQuantity(usage)}>
-                        <AddCircleOutlineIcon />
-                      </IconButton>
-                      <Typography variant="body2" color="text.secondary" sx={{ width: '3em', textAlign: 'left', ml: 1 }}>
-                        {usage['単位'] || '個'}
-                      </Typography>
-                      <IconButton size="small" onClick={() => handleRemoveUsage(usage)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
+                <ListItem key={index} divider sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', py: 1 }}>
+                  <Box sx={{ width: '100%' }}>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                      {usage['商品名']}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {`管理No.: ${usage['管理No.']} / ${new Date(usage['使用日']).toLocaleDateString()}`}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1, width: '100%', justifyContent: 'flex-end' }}>
+                    <IconButton size="small" onClick={() => handleDecreaseQuantity(usage)}>
+                      <RemoveCircleOutlineIcon />
+                    </IconButton>
+                    <Typography variant="h6" component="div" sx={{ minWidth: '2ch', textAlign: 'center' }}>
+                      {usage['使用数']}
+                    </Typography>
+                    <IconButton size="small" onClick={() => handleIncreaseQuantity(usage)}>
+                      <AddCircleOutlineIcon />
+                    </IconButton>
+                    <Typography variant="body2" color="text.secondary" sx={{ width: '3em', textAlign: 'left', ml: 1 }}>
+                      {usage['単位'] || '個'}
+                    </Typography>
+                    <IconButton size="small" onClick={() => handleRemoveUsage(usage)}>
+                      <DeleteIcon />
+                    </IconButton>
                   </Box>
                 </ListItem>
               ))}
