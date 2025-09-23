@@ -176,6 +176,16 @@ function InventoryList() {
     item['在庫'] > 0 && (selectedProduct === '' || item['商品名'] === selectedProduct)
   );
 
+  // 絞り込み後の在庫合計を計算
+  const totalInventoryCount = filteredInventory.reduce((sum, item) => sum + (item['在庫'] || 0), 0);
+
+  // 重さごとの在庫合計を計算
+  const inventoryByWeight = filteredInventory.reduce((acc, item) => {
+    const weight = item['重さ'] && item['重さ'] !== '無' ? `${item['重さ']}kg` : '重さなし';
+    acc[weight] = (acc[weight] || 0) + (item['在庫'] || 0);
+    return acc;
+  }, {});
+
   return (
     <>
       <StickyHeader>
@@ -202,6 +212,23 @@ function InventoryList() {
             </Select>
           </FormControl>
         </Box>
+        {filteredInventory.length > 0 && (
+          <Box sx={{ mt: 2, p: 1, border: '1px solid #e0e0e0', borderRadius: '4px', bgcolor: '#f9f9f9' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+              合計在庫数: {totalInventoryCount} 個
+            </Typography>
+            {Object.keys(inventoryByWeight).length > 1 && ( // 重さなし以外に複数の重さがある場合のみ表示
+              <Box sx={{ mt: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>重さ別合計:</Typography>
+                {Object.entries(inventoryByWeight).map(([weight, count]) => (
+                  <Typography variant="body2" key={weight} sx={{ ml: 1 }}>
+                    {weight}: {count} 個
+                  </Typography>
+                ))}
+              </Box>
+            )}
+          </Box>
+        )}
       </StickyHeader>
 
       <Box sx={{ p: 2, pb: 15 }}>
