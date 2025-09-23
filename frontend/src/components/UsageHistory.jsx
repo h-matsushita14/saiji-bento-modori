@@ -99,7 +99,7 @@ function UsageHistory() {
           絞り込み
         </Typography>
         <Grid container sx={{ mb: 2, flexGrow: 1 }}> {/* Product filter row, removed spacing={2} */}
-          <Grid item xs={12}> {/* Always full width on xs */}
+          <Grid item xs={12} sm={12}> {/* Explicitly full width on sm and up */}
             <Autocomplete
               options={[...new Set(usageHistory.map(item => item.商品名))]} // Unique product names
               value={selectedProduct}
