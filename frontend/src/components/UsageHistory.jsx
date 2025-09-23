@@ -98,8 +98,7 @@ function UsageHistory() {
         <Typography variant="h6" gutterBottom>
           絞り込み
         </Typography>
-        <Grid container spacing={2}>
-          {/* Product filter */}
+        <Grid container spacing={2} sx={{ mb: 2, flexGrow: 1 }}> {/* Product filter row */}
           <Grid item xs={12}> {/* Always full width on xs */}
             <Autocomplete
               options={[...new Set(usageHistory.map(item => item.商品名))]} // Unique product names
@@ -118,7 +117,8 @@ function UsageHistory() {
               )}
             />
           </Grid>
-          {/* Date range filter */}
+        </Grid>
+        <Grid container spacing={2}> {/* Date range filter row */}
           <Grid item xs={12} sm={6}>
             <TextField
               label="期間開始日"
