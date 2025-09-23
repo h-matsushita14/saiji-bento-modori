@@ -228,7 +228,7 @@ function InventoryList() {
                           <Typography variant="body2" color="text.secondary">管理No.: {item['管理No.']}</Typography>
                           <Typography variant="body2" color="text.secondary">戻り記録日: {formatDate(item['戻り記録日'])}</Typography>
                           <Typography variant="body2" color="text.secondary">催事名: {item['催事名']}</Typography>
-                          <Typography variant="body1">在庫: {item['在庫']}</Typography>
+                          <Typography variant="body1" sx={{ textAlign: 'right' }}>在庫: {item['在庫']}</Typography>
                           <Typography variant="body1">重さ: {item['重さ'] ? `${item['重さ']}kg` : '-'}</Typography>
                           <Box sx={{ mt: 1, width: '100%' }}>
                             <Button variant="contained" size="small" fullWidth onClick={() => handleOpenUsageDialog(item)}>この在庫を使用する</Button>
@@ -252,7 +252,7 @@ function InventoryList() {
                   <TableCell>催事名</TableCell>
                   <TableCell>商品名</TableCell>
                   <TableCell>重さ</TableCell>
-                  <TableCell>在庫</TableCell>
+                  <TableCell align="right">在庫</TableCell>
                   <TableCell></TableCell>
                 </TableRow>
               </TableHead>
@@ -264,7 +264,7 @@ function InventoryList() {
                     <TableCell>{item['催事名']}</TableCell>
                     <TableCell>{item['商品名']}</TableCell>
                     <TableCell>{item['重さ'] ? `${item['重さ']}kg` : '-'}</TableCell>
-                    <TableCell>{item['在庫']}</TableCell>
+                    <TableCell align="right">{item['在庫']}</TableCell>
                     <TableCell>
                       <Button variant="contained" size="small" onClick={() => handleOpenUsageDialog(item)}>この在庫を使用する</Button>
                     </TableCell>
