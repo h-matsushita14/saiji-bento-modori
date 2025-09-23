@@ -63,6 +63,7 @@ function InventoryList() {
   const [usageDate, setUsageDate] = useState('');
   const [usageQuantity, setUsageQuantity] = useState(0);
   const [usageError, setUsageError] = useState('');
+  const [openConfirmUsageDialog, setOpenConfirmUsageDialog] = useState(false); // New state
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -125,7 +126,7 @@ function InventoryList() {
       '使用数': usageQuantity,
     };
     
-    addPendingUsage(usageData); // API送信の代わりに一時保存用の関数を呼び出す
+    addPendingUsage(usageData, selectedInventoryItem['商品名']); // Pass productName
     handleCloseUsageDialog();
   };
 
@@ -220,7 +221,16 @@ function InventoryList() {
         boxShadow: 3,
         display: 'flex',
         justifyContent: 'center',
+        gap: 2, // Add gap between buttons
       }}>
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={() => setOpenConfirmUsageDialog(true)}
+          disabled={pendingUsages.length === 0}
+        >
+          使用数の確認
+        </Button>
         <Button
           variant="contained"
           color="primary"
@@ -278,6 +288,52 @@ function InventoryList() {
         <DialogActions>
           <Button onClick={handleCloseUsageDialog}>キャンセル</Button>
           <Button onClick={handleRegisterUsage} variant="contained">登録</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirm Usage Dialog */}
+      <Dialog open={openConfirmUsageDialog} onClose={() => setOpenConfirmUsageDialog(false)} fullWidth maxWidth="sm">
+        <DialogTitle>登録した使用数の確認</DialogTitle>
+        <DialogContent>
+          {pendingUsages.length === 0 ? (
+            <Typography>確認する使用記録はありません。</Typography>
+          ) : (
+            <TableContainer component={Paper}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>管理No.</TableCell>
+                    <TableCell>商品名</TableCell>
+                    <TableCell>使用日</TableCell>
+                    <TableCell align="right">使用数</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {pendingUsages.map((usage, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{usage['管理No.']}</TableCell>
+                      <TableCell>{usage['商品名']}</TableCell>
+                      <TableCell>{new Date(usage['使用日']).toLocaleDateString()}</TableCell>
+                      <TableCell align="right">{usage['使用数']}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenConfirmUsageDialog(false)}>閉じる</Button>
+          <Button
+            onClick={() => {
+              submitPendingUsages();
+              setOpenConfirmUsageDialog(false);
+            }}
+            variant="contained"
+            disabled={pendingUsages.length === 0}
+          >
+            送信
+          </Button>
         </DialogActions>
       </Dialog>
     </>
