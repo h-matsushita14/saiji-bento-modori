@@ -151,18 +151,35 @@ function addReturnRecords(records) { // records は配列
       throw new Error('「管理No.」列が見つかりません。');
     }
 
-    const serials = allData
-      .map(row => row[managementNoIndex])
-      .filter(managementNo => managementNo && typeof managementNo.startsWith === 'function' && managementNo.startsWith(datePrefix))
-      .map(managementNo => parseInt(managementNo.slice(-2), 10));
-    
-    let currentMaxSerial = serials.length > 0 ? Math.max(...serials) : 0;
+    const existingManagementNos = new Set();
+    let currentMaxSerial = 0;
+
+    // Populate existingManagementNos and find currentMaxSerial for the datePrefix
+    allData.forEach(row => {
+      const managementNo = row[managementNoIndex];
+      if (managementNo) {
+        existingManagementNos.add(managementNo);
+        if (typeof managementNo.startsWith === 'function' && managementNo.startsWith(datePrefix)) {
+          const serial = parseInt(managementNo.slice(-2), 10);
+          if (!isNaN(serial)) {
+            currentMaxSerial = Math.max(currentMaxSerial, serial);
+          }
+        }
+      }
+    });
     // --- 取得ここまで ---
 
     const newRows = records.map(record => {
-      currentMaxSerial++; // 通し番号をインクリメント
-      const newSerial = ('0' + currentMaxSerial).slice(-2);
-      const newManagementNo = datePrefix + newSerial;
+      let newManagementNo;
+      let newSerial;
+      do {
+        currentMaxSerial++; // 通し番号をインクリメント
+        newSerial = ('0' + currentMaxSerial).slice(-2);
+        newManagementNo = datePrefix + newSerial;
+      } while (existingManagementNos.has(newManagementNo)); // Check for uniqueness
+
+      // Add the newly generated management number to the set to prevent duplicates within the same batch
+      existingManagementNos.add(newManagementNo);
 
       const { '戻り記録日': rec_returnDate, '催事名': eventName, '商品名': productName, '数量': quantity, '重さ': weight } = record;
       
