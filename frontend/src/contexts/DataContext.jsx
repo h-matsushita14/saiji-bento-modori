@@ -130,10 +130,16 @@ export const DataProvider = ({ children }) => {
     }
     
     setIsLoading(true); // 送信中にローディング表示
+    setProgress(0); // プログレスバーをリセット
+
     try {
-      // バックエンドが一括登録に対応していないため、一件ずつ登録
+      const totalUsages = pendingUsages.length;
+      let completedUsages = 0;
+
       for (const usage of pendingUsages) {
         await addUsageRecord(usage);
+        completedUsages++;
+        setProgress((completedUsages / totalUsages) * 100); // 進行状況を更新
       }
       
       setPendingUsages([]); // 送信成功したらクリア
@@ -146,6 +152,7 @@ export const DataProvider = ({ children }) => {
       // エラーが起きてもpendingUsagesはクリアしないでおく
     } finally {
       setIsLoading(false);
+      setProgress(0); // 完了したらプログレスバーをリセット
     }
   }, [pendingUsages, loadAllData]);
 
