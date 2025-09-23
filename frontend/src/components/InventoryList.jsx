@@ -30,6 +30,10 @@ import MenuItem from '@mui/material/MenuItem';
 import Badge from '@mui/material/Badge';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import IconButton from '@mui/material/IconButton';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 // ヘッダーのスタイル
 const StickyHeader = styled(Box)(({ theme }) => ({
@@ -58,7 +62,9 @@ function InventoryList() {
     pendingUsages,
     addPendingUsage,
     submitPendingUsages,
-    products
+    products,
+    updatePendingUsageQuantity,
+    removePendingUsage
   } = useData();
 
   const [openUsageDialog, setOpenUsageDialog] = useState(false);
@@ -135,6 +141,28 @@ function InventoryList() {
     
     addPendingUsage(usageData, selectedInventoryItem['商品名'], unit);
     handleCloseUsageDialog();
+  };
+
+  const handleIncreaseQuantity = (usage) => {
+    const inventoryItem = inventory.find(item => item['管理No.'] === usage['管理No.']);
+    if (!inventoryItem) return;
+
+    const totalStock = inventoryItem['在庫'] + usage['使用数'];
+    const newQuantity = usage['使用数'] + 1;
+    if (newQuantity <= totalStock) {
+      updatePendingUsageQuantity(usage['管理No.'], newQuantity);
+    }
+  };
+
+  const handleDecreaseQuantity = (usage) => {
+    const newQuantity = usage['使用数'] - 1;
+    if (newQuantity >= 1) {
+      updatePendingUsageQuantity(usage['管理No.'], newQuantity);
+    }
+  };
+
+  const handleRemoveUsage = (usage) => {
+    removePendingUsage(usage['管理No.']);
   };
 
   // 在庫のある商品リストを生成（絞り込み用）
@@ -267,7 +295,7 @@ function InventoryList() {
           onClick={() => setOpenConfirmUsageDialog(true)}
           disabled={pendingUsages.length === 0}
         >
-          使用数の確認
+          使用数の確認・修正
         </Button>
         <Button
           variant="contained"
@@ -331,7 +359,7 @@ function InventoryList() {
 
       {/* Confirm Usage Dialog */}
       <Dialog open={openConfirmUsageDialog} onClose={() => setOpenConfirmUsageDialog(false)} fullWidth maxWidth="sm">
-        <DialogTitle>登録した使用数の確認</DialogTitle>
+        <DialogTitle>登録した使用数の確認・修正</DialogTitle>
         <DialogContent dividers>
           {pendingUsages.length === 0 ? (
             <Typography sx={{ p: 2 }}>確認する使用記録はありません。</Typography>
@@ -340,7 +368,7 @@ function InventoryList() {
               {pendingUsages.map((usage, index) => (
                 <ListItem key={index} divider>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', py: 1 }}>
-                    <Box>
+                    <Box sx={{ flexGrow: 1 }}>
                       <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                         {usage['商品名']}
                       </Typography>
@@ -348,13 +376,22 @@ function InventoryList() {
                         {`管理No.: ${usage['管理No.']} / ${new Date(usage['使用日']).toLocaleDateString()}`}
                       </Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5 }}>
-                      <Typography variant="h6" component="div">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 1 }}>
+                      <IconButton size="small" onClick={() => handleDecreaseQuantity(usage)}>
+                        <RemoveCircleOutlineIcon />
+                      </IconButton>
+                      <Typography variant="h6" component="div" sx={{ minWidth: '2ch', textAlign: 'center' }}>
                         {usage['使用数']}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <IconButton size="small" onClick={() => handleIncreaseQuantity(usage)}>
+                        <AddCircleOutlineIcon />
+                      </IconButton>
+                      <Typography variant="body2" color="text.secondary" sx={{ width: '3em', textAlign: 'left', ml: 1 }}>
                         {usage['単位'] || '個'}
                       </Typography>
+                      <IconButton size="small" onClick={() => handleRemoveUsage(usage)}>
+                        <DeleteIcon />
+                      </IconButton>
                     </Box>
                   </Box>
                 </ListItem>

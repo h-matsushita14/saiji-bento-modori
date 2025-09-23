@@ -118,9 +118,20 @@ export const DataProvider = ({ children }) => {
   );
 
   // 未送信の使用記録を追加する関数
-  // 未送信の使用記録を追加する関数
   const addPendingUsage = useCallback((usageRecord, productName, unit) => {
     setPendingUsages(prev => [...prev, { ...usageRecord, '商品名': productName, '単位': unit }]);
+  }, []);
+
+  const updatePendingUsageQuantity = useCallback((managementNo, newQuantity) => {
+    setPendingUsages(prev => prev.map(usage =>
+      usage['管理No.'] === managementNo
+        ? { ...usage, '使用数': newQuantity }
+        : usage
+    ));
+  }, []);
+
+  const removePendingUsage = useCallback((managementNo) => {
+    setPendingUsages(prev => prev.filter(usage => usage['管理No.'] !== managementNo));
   }, []);
 
   // 未送信の使用記録をサーバーに送信する関数
@@ -169,6 +180,8 @@ export const DataProvider = ({ children }) => {
     progress,
     reloadData: loadAllData,
     addPendingUsage,
+    updatePendingUsageQuantity,
+    removePendingUsage,
     submitPendingUsages,
   };
 

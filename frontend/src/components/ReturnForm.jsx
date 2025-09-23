@@ -317,7 +317,7 @@ function ReturnForm() {
               ※リストに催事名がない場合⇒
             </Typography>
             <Button variant="contained" onClick={handleOpenDialog} disabled={loading}>
-              新規/追加
+              {'新規\u200B追加'}
             </Button>
           </Box>
         </Box>
