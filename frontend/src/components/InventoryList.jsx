@@ -251,8 +251,8 @@ function InventoryList() {
                   <TableCell>戻り記録日</TableCell>
                   <TableCell>催事名</TableCell>
                   <TableCell>商品名</TableCell>
-                  <TableCell>在庫</TableCell>
                   <TableCell>重さ</TableCell>
+                  <TableCell>在庫</TableCell>
                   <TableCell></TableCell>
                 </TableRow>
               </TableHead>
@@ -263,8 +263,8 @@ function InventoryList() {
                     <TableCell>{formatDate(item['戻り記録日'])}</TableCell>
                     <TableCell>{item['催事名']}</TableCell>
                     <TableCell>{item['商品名']}</TableCell>
-                    <TableCell>{item['在庫']}</TableCell>
                     <TableCell>{item['重さ'] ? `${item['重さ']}kg` : '-'}</TableCell>
+                    <TableCell>{item['在庫']}</TableCell>
                     <TableCell>
                       <Button variant="contained" size="small" onClick={() => handleOpenUsageDialog(item)}>この在庫を使用する</Button>
                     </TableCell>
