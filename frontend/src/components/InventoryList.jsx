@@ -41,7 +41,7 @@ const StickyHeader = styled(Box)(({ theme }) => ({
   top: 0,
   backgroundColor: theme.palette.background.paper,
   padding: theme.spacing(2),
-  zIndex: 1100, // AppBarより手前に来るように
+  zIndex: 1000,
   borderBottom: `1px solid ${theme.palette.divider}`,
 }));
 
