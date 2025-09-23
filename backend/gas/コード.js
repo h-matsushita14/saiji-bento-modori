@@ -29,8 +29,6 @@ function doGet(e) {
       data = getUsageHistoryData();
     } else if (action === 'getEventList') {
       data = getEventListData();
-    } else if (action === 'getReturnRecords') {
-      data = getReturnRecordsData();
     } else {
       const masterSheet = spreadsheet.getSheetByName(MASTER_SHEET_NAME);
       const usageSheet = spreadsheet.getSheetByName(USAGE_SHEET_NAME);
@@ -143,11 +141,34 @@ function addReturnRecords(records) { // records は配列
     const day = ('0' + date.getDate()).slice(-2);
     const datePrefix = year + month + day;
 
-    // Read all data again to ensure it's fresh after acquiring the lock
-    const freshAllData = masterSheet.getDataRange().getValues();
-    const freshHeaders = freshAllData.length > 0 ? freshAllData.shift() : [];
-    const managementNoIndex = freshHeaders.indexOf('管理No.');
+    // Get all data including headers to ensure freshness after acquiring the lock
+    const sheetData = masterSheet.getDataRange().getValues();
+    
+    // Handle empty sheet or only header row
+    if (sheetData.length <= 1) {
+      let currentMaxSerial = 0;
+      const existingManagementNos = new Set(); // Will remain empty
 
+      const newRows = records.map(record => {
+        currentMaxSerial++;
+        const newSerial = ('0' + currentMaxSerial).slice(-2);
+        const newManagementNo = datePrefix + newSerial;
+        existingManagementNos.add(newManagementNo); // Add to set for uniqueness within batch
+
+        const { '戻り記録日': rec_returnDate, '催事名': eventName, '商品名': productName, '数量': quantity, '重さ': weight } = record;
+        return [rec_returnDate, eventName, productName, weight || '', quantity, newManagementNo, ''];
+      });
+
+      if (newRows.length > 0) {
+        masterSheet.getRange(masterSheet.getLastRow() + 1, 1, newRows.length, newRows[0].length).setValues(newRows);
+      }
+      return; // Exit function
+    }
+
+    const headers = sheetData[0];
+    const dataRows = sheetData.slice(1); // All rows except the header
+
+    const managementNoIndex = headers.indexOf('管理No.');
     if (managementNoIndex === -1) {
       throw new Error('「管理No.」列が見つかりません。');
     }
@@ -155,12 +176,14 @@ function addReturnRecords(records) { // records は配列
     const existingManagementNos = new Set();
     let currentMaxSerial = 0;
 
-    freshAllData.forEach(row => {
+    dataRows.forEach(row => {
       const managementNo = row[managementNoIndex];
       if (managementNo) {
-        existingManagementNos.add(managementNo);
-        if (typeof managementNo.startsWith === 'function' && managementNo.startsWith(datePrefix)) {
-          const serial = parseInt(managementNo.slice(-2), 10);
+        existingManagementNos.add(managementNo.toString()); // Ensure string for comparison
+        // Only consider management numbers that start with the current datePrefix for max serial
+        if (typeof managementNo.toString().startsWith === 'function' && managementNo.toString().startsWith(datePrefix)) {
+          const serialPart = managementNo.toString().slice(-2);
+          const serial = parseInt(serialPart, 10);
           if (!isNaN(serial)) {
             currentMaxSerial = Math.max(currentMaxSerial, serial);
           }
@@ -176,6 +199,10 @@ function addReturnRecords(records) { // records は配列
         currentMaxSerial++; // 通し番号をインクリメント
         newSerial = ('0' + currentMaxSerial).slice(-2);
         newManagementNo = datePrefix + newSerial;
+        // Safety check: if serial exceeds 99, something is wrong or design needs adjustment
+        if (currentMaxSerial > 99) {
+            throw new Error('同日の管理No.が100を超えました。システム設計を見直してください。');
+        }
       } while (existingManagementNos.has(newManagementNo)); // Check for uniqueness
 
       // Add the newly generated management number to the set to prevent duplicates within the same batch
