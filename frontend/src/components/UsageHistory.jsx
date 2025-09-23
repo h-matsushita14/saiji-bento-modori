@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { useData } from '../contexts/DataContext'; // 変更
 
 // MUI Components
@@ -22,41 +22,44 @@ function UsageHistory() {
 
   return (
     <Box sx={{ mt: 4 }}>
-      <Typography variant="h4" component="h2" gutterBottom>
-        使用履歴
-      </Typography>
-      {usageHistory.length === 0 ? (
-        <Alert severity="info">使用履歴がありません。</Alert>
-      ) : ( // 常にカード表示
-        <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
-          <Table aria-label="usage history table">
-            <TableHead>
-              <TableRow>
-                <TableCell>使用履歴</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {usageHistory.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <Card sx={{ width: "100%" }}>
-                      <CardContent>
-                        <Typography variant="h6" component="div">{row.商品名}</Typography>
-                        <Typography variant="body2" color="text.secondary">管理No.: {row.管理No}</Typography>
-                        <Typography variant="body2" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                          使用日: {new Date(row.使用日).toLocaleDateString()}
-                        </Typography>
-                        <Typography variant="body2" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                          使用数: {row.使用数}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </TableCell>
+      <Fragment>
+        <Typography variant="h4" component="h2" gutterBottom>
+          使用履歴
+        </Typography>
+        {usageHistory.length === 0 ? (
+          <Alert severity="info">使用履歴がありません。</Alert>
+        ) : ( // 常にカード表示
+          <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+            <Table aria-label="usage history table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>使用履歴</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {usageHistory.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Card sx={{ width: "100%" }}>
+                        <CardContent>
+                          <Typography variant="h6" component="div">{row.商品名}</Typography>
+                          <Typography variant="body2" color="text.secondary">管理No.: {row.管理No}</Typography>
+                          <Typography variant="body2" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                            使用日: {new Date(row.使用日).toLocaleDateString()}
+                          </Typography>
+                          <Typography variant="body2" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                            使用数: {row.使用数}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Fragment>
     </Box>
   );
 }
