@@ -29,31 +29,58 @@ function doGet(e) {
       data = getUsageHistoryData();
     } else if (action === 'getEventList') {
       data = getEventListData();
-    } else {
+    } else { // デフォルトのアクション: 在庫一覧の取得
       const masterSheet = spreadsheet.getSheetByName(MASTER_SHEET_NAME);
       const usageSheet = spreadsheet.getSheetByName(USAGE_SHEET_NAME);
       if (!masterSheet || !usageSheet) {
         throw new Error('必要なシートが見つかりません。');
       }
-      const masterData = masterSheet.getDataRange().getValues();
+
+      // 使用数データを取得し、管理No.ごとに合計
       const usageData = usageSheet.getDataRange().getValues();
-      const masterHeaders = masterData.shift();
-      const usageHeaders = usageData.shift();
-      const masterRecords = masterData.map(row => {
+      const usageHeaders = usageData.shift() || [];
+      const usageManagementNoIndex = usageHeaders.indexOf('管理No.');
+      const usageQuantityIndex = usageHeaders.indexOf('使用数');
+      const usageMap = new Map();
+      if (usageManagementNoIndex !== -1 && usageQuantityIndex !== -1) {
+        usageData.forEach(row => {
+          const managementNo = row[usageManagementNoIndex];
+          const usageQuantity = Number(row[usageQuantityIndex]) || 0;
+          if (managementNo) {
+            usageMap.set(managementNo.toString(), (usageMap.get(managementNo.toString()) || 0) + usageQuantity);
+          }
+        });
+      }
+
+      // マスターシートのデータを取得
+      const masterData = masterSheet.getDataRange().getValues();
+      const masterHeaders = masterData.shift() || [];
+      const returnDateIndex = masterHeaders.indexOf('戻り記録日');
+
+
+      // マスターデータに在庫情報を付与
+      data = masterData.map(row => {
         const record = {};
         masterHeaders.forEach((header, i) => {
-          record[header] = row[i];
+          // 日付形式を 'yyyy-MM-dd' にフォーマット
+          if (header === '戻り記録日' && row[i] instanceof Date) {
+            record[header] = Utilities.formatDate(row[i], "Asia/Tokyo", "yyyy-MM-dd");
+          } else {
+            record[header] = row[i];
+          }
         });
+
+        const managementNo = record['管理No.'];
+        if (managementNo) {
+            const initialQuantity = Number(record['数量']) || 0;
+            const totalUsage = usageMap.get(managementNo.toString()) || 0;
+            record['在庫'] = initialQuantity - totalUsage;
+        } else {
+            record['在庫'] = Number(record['数量']) || 0;
+        }
+        
         return record;
       });
-      const usageRecords = usageData.map(row => {
-        const record = {};
-        usageHeaders.forEach((header, i) => {
-          record[header] = row[i];
-        });
-        return record;
-      });
-      data = calculateInventory(masterRecords, usageRecords);
     }
     
     response = { status: 'success', data: data };

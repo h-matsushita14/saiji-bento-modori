@@ -28,6 +28,8 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Badge from '@mui/material/Badge';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 
 // ヘッダーのスタイル
 const StickyHeader = styled(Box)(({ theme }) => ({
@@ -64,6 +66,7 @@ function InventoryList() {
   const [usageQuantity, setUsageQuantity] = useState(0);
   const [usageError, setUsageError] = useState('');
   const [openConfirmUsageDialog, setOpenConfirmUsageDialog] = useState(false); // New state
+  const [selectedProduct, setSelectedProduct] = useState(''); // 絞り込み用のstate
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -130,6 +133,17 @@ function InventoryList() {
     handleCloseUsageDialog();
   };
 
+  // 在庫のある商品リストを生成（絞り込み用）
+  const availableProducts = inventory
+    .filter(item => item['在庫'] > 0)
+    .map(item => item['商品名'])
+    .filter((value, index, self) => self.indexOf(value) === index); // 重複を除外
+
+  // 絞り込み後の在庫リスト
+  const filteredInventory = inventory.filter(item => 
+    item['在庫'] > 0 && (selectedProduct === '' || item['商品名'] === selectedProduct)
+  );
+
   return (
     <>
       <StickyHeader>
@@ -138,11 +152,31 @@ function InventoryList() {
             在庫一覧
           </Typography>
         </Box>
+        <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="body1" sx={{ flexShrink: 0 }}>商品を絞り込む:</Typography>
+          <FormControl size="small" fullWidth>
+            <InputLabel>商品を選択</InputLabel>
+            <Select
+              value={selectedProduct}
+              label="商品を選択"
+              onChange={(e) => setSelectedProduct(e.target.value)}
+            >
+              <MenuItem value="">
+                <em>すべて</em>
+              </MenuItem>
+              {availableProducts.map(productName => (
+                <MenuItem key={productName} value={productName}>{productName}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
       </StickyHeader>
 
       <Box sx={{ p: 2, pb: 15 }}>
         {inventory.length === 0 ? (
           <Alert severity="info">在庫データがありません。</Alert>
+        ) : filteredInventory.length === 0 ? (
+          <Alert severity="info">選択された商品の在庫はありません。</Alert>
         ) : isMobile ? (
           // モバイル表示
           <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
@@ -153,7 +187,7 @@ function InventoryList() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {inventory.filter(item => item['在庫'] > 0).map((item, index) => (
+                {filteredInventory.map((item, index) => (
                   <TableRow key={index}>
                     <TableCell>
                       <Card sx={{ width: "100%" }}>
@@ -191,7 +225,7 @@ function InventoryList() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {inventory.filter(item => item['在庫'] > 0).map((item, index) => (
+                {filteredInventory.map((item, index) => (
                   <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                     <TableCell component="th" scope="row">{item['管理No.']}</TableCell>
                     <TableCell>{formatDate(item['戻り記録日'])}</TableCell>
@@ -294,32 +328,34 @@ function InventoryList() {
       {/* Confirm Usage Dialog */}
       <Dialog open={openConfirmUsageDialog} onClose={() => setOpenConfirmUsageDialog(false)} fullWidth maxWidth="sm">
         <DialogTitle>登録した使用数の確認</DialogTitle>
-        <DialogContent>
+        <DialogContent dividers>
           {pendingUsages.length === 0 ? (
-            <Typography>確認する使用記録はありません。</Typography>
+            <Typography sx={{ p: 2 }}>確認する使用記録はありません。</Typography>
           ) : (
-            <TableContainer component={Paper}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>管理No.</TableCell>
-                    <TableCell>商品名</TableCell>
-                    <TableCell>使用日</TableCell>
-                    <TableCell align="right">使用数</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {pendingUsages.map((usage, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{usage['管理No.']}</TableCell>
-                      <TableCell>{usage['商品名']}</TableCell>
-                      <TableCell>{new Date(usage['使用日']).toLocaleDateString()}</TableCell>
-                      <TableCell align="right">{usage['使用数']}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+              {pendingUsages.map((usage, index) => (
+                <ListItem key={index} divider>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', py: 1 }}>
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                        {usage['商品名']}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {`管理No.: ${usage['管理No.']} / ${new Date(usage['使用日']).toLocaleDateString()}`}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5 }}>
+                      <Typography variant="h6" component="div">
+                        {usage['使用数']}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        個
+                      </Typography>
+                    </Box>
+                  </Box>
+                </ListItem>
+              ))}
+            </List>
           )}
         </DialogContent>
         <DialogActions>
