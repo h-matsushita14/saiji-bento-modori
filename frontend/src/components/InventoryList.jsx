@@ -136,20 +136,10 @@ function InventoryList() {
           <Typography variant="h4" component="h2">
             在庫一覧
           </Typography>
-          <Button 
-            variant="contained" 
-            color="primary"
-            onClick={submitPendingUsages}
-            disabled={pendingUsages.length === 0}
-          >
-            <Badge badgeContent={pendingUsages.length} color="error" sx={{ mr: 2 }}>
-              登録した使用数の送信
-            </Badge>
-          </Button>
         </Box>
       </StickyHeader>
 
-      <Box sx={{ p: 2 }}>
+      <Box sx={{ p: 2, pb: 15 }}>
         {inventory.length === 0 ? (
           <Alert severity="info">在庫データがありません。</Alert>
         ) : isMobile ? (
@@ -217,6 +207,31 @@ function InventoryList() {
             </Table>
           </TableContainer>
         )}
+      </Box>
+
+      <Box sx={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
+        p: 2,
+        bgcolor: 'background.paper',
+        boxShadow: 3,
+        display: 'flex',
+        justifyContent: 'center',
+      }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={submitPendingUsages}
+          disabled={pendingUsages.length === 0}
+          fullWidth
+        >
+          <Badge badgeContent={pendingUsages.length} color="error" sx={{ mr: 2 }}>
+            登録した使用数の送信
+          </Badge>
+        </Button>
       </Box>
 
       <Dialog open={openUsageDialog} onClose={handleCloseUsageDialog}>
