@@ -76,7 +76,7 @@ function UsageHistory() {
         <Typography variant="h6" gutterBottom>
           絞り込み
         </Typography>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} sx={{ mb: 2 }}> {/* Product filter row */}
           <Grid item xs={12} sm={6}>
             <Autocomplete
               options={[...new Set(usageHistory.map(item => item.商品名))]} // Unique product names
@@ -95,25 +95,43 @@ function UsageHistory() {
               )}
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+        </Grid>
+        <Grid container spacing={2}> {/* Date range filter row */}
+          <Grid item xs={12} sm={6}>
             <TextField
               label="期間開始日"
               type="date"
               fullWidth
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              onChange={(e) => {
+                const newStartDate = e.target.value;
+                if (endDate && newStartDate > endDate) {
+                  setEndDate(newStartDate);
+                  setStartDate(endDate);
+                } else {
+                  setStartDate(newStartDate);
+                }
+              }}
               InputLabelProps={{ shrink: true }}
               variant="outlined"
               size="small"
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={6}>
             <TextField
               label="期間終了日"
               type="date"
               fullWidth
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              onChange={(e) => {
+                const newEndDate = e.target.value;
+                if (startDate && newEndDate < startDate) {
+                  setStartDate(newEndDate);
+                  setEndDate(startDate);
+                } else {
+                  setEndDate(newEndDate);
+                }
+              }}
               InputLabelProps={{ shrink: true }}
               variant="outlined"
               size="small"
