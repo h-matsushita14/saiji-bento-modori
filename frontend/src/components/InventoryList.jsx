@@ -57,7 +57,8 @@ function InventoryList() {
     inventory,
     pendingUsages,
     addPendingUsage,
-    submitPendingUsages
+    submitPendingUsages,
+    products
   } = useData();
 
   const [openUsageDialog, setOpenUsageDialog] = useState(false);
@@ -123,13 +124,16 @@ function InventoryList() {
       return;
     }
 
+    const product = products.find(p => p['商品名'] === selectedInventoryItem['商品名']);
+    const unit = product ? product['単位'] : '個';
+
     const usageData = {
       '管理No.': selectedInventoryItem['管理No.'],
       '使用日': usageDate,
       '使用数': usageQuantity,
     };
     
-    addPendingUsage(usageData, selectedInventoryItem['商品名']); // Pass productName
+    addPendingUsage(usageData, selectedInventoryItem['商品名'], unit);
     handleCloseUsageDialog();
   };
 
@@ -349,7 +353,7 @@ function InventoryList() {
                         {usage['使用数']}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        個
+                        {usage['単位'] || '個'}
                       </Typography>
                     </Box>
                   </Box>

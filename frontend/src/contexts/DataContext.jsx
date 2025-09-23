@@ -118,8 +118,9 @@ export const DataProvider = ({ children }) => {
   );
 
   // 未送信の使用記録を追加する関数
-  const addPendingUsage = useCallback((usageRecord, productName) => {
-    setPendingUsages(prev => [...prev, { ...usageRecord, '商品名': productName }]);
+  // 未送信の使用記録を追加する関数
+  const addPendingUsage = useCallback((usageRecord, productName, unit) => {
+    setPendingUsages(prev => [...prev, { ...usageRecord, '商品名': productName, '単位': unit }]);
   }, []);
 
   // 未送信の使用記録をサーバーに送信する関数

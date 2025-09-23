@@ -314,10 +314,10 @@ function ReturnForm() {
           />
           <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
             <Typography variant="body2" sx={{ mr: 1 }}>
-              ※リストに催事名がない場合はこちらから追加⇒
+              ※リストに催事名がない場合⇒
             </Typography>
             <Button variant="contained" onClick={handleOpenDialog} disabled={loading}>
-              新規追加
+              新規/追加
             </Button>
           </Box>
         </Box>
