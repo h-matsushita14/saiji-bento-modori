@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 
 // MUI Components
@@ -28,6 +28,28 @@ function UsageHistory() {
   const [selectedProduct, setSelectedProduct] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+
+  useEffect(() => {
+    const getMonthRange = () => {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth(); // 0-indexed
+
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0); // Day 0 of next month is last day of current month
+
+      const format = (date) => {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      };
+
+      setStartDate(format(firstDay));
+      setEndDate(format(lastDay));
+    };
+    getMonthRange();
+  }, []); // Run only once on mount
 
   const productMap = new Map(products.map(p => [p['商品名'], p['単位']]));
 
@@ -77,7 +99,7 @@ function UsageHistory() {
           絞り込み
         </Typography>
         <Grid container spacing={2} sx={{ mb: 2 }}> {/* Product filter row */}
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={8}> {/* Changed sm={6} to sm={8} */}
             <Autocomplete
               options={[...new Set(usageHistory.map(item => item.商品名))]} // Unique product names
               value={selectedProduct}
