@@ -294,7 +294,7 @@ function InventoryList() {
           color="primary"
           onClick={() => setOpenConfirmUsageDialog(true)}
           disabled={pendingUsages.length === 0}
-          sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.2, textAlign: 'center', width: '8em' }}
+          sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.2, textAlign: 'center', width: { xs: '120px', sm: '8em' } }}
         >
           {'使用数の\n確認・修正'}
         </Button>
