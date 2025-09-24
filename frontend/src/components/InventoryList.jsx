@@ -179,6 +179,10 @@ function InventoryList() {
   // 絞り込み後の在庫合計を計算
   const totalInventoryCount = filteredInventory.reduce((sum, item) => sum + (item['在庫'] || 0), 0);
 
+  // 選択された商品の単位を取得
+  const selectedProductData = products.find(p => p['商品名'] === selectedProduct);
+  const selectedUnit = selectedProductData ? selectedProductData['単位'] : '個';
+
   // 重さごとの在庫合計を計算
   const inventoryByWeight = filteredInventory.reduce((acc, item) => {
     const weight = item['重さ'] && item['重さ'] !== '無' ? `${item['重さ']}kg` : '重さなし';
@@ -219,13 +223,13 @@ function InventoryList() {
                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>重さ別合計:</Typography>
                 {Object.entries(inventoryByWeight).map(([weight, count]) => (
                   <Typography variant="body2" key={weight} sx={{ ml: 1 }}>
-                    {weight}: {count} 個
+                    {weight}: {count} {selectedUnit}
                   </Typography>
                 ))}
               </Box>
             ) : (
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                合計在庫数: {totalInventoryCount} 個
+                合計在庫数: {totalInventoryCount} {selectedUnit}
               </Typography>
             )}
           </Box>
