@@ -212,20 +212,21 @@ function InventoryList() {
             </Select>
           </FormControl>
         </Box>
-        {filteredInventory.length > 0 && (
+        {selectedProduct !== '' && filteredInventory.length > 0 && (
           <Box sx={{ mt: 2, p: 1, border: '1px solid #e0e0e0', borderRadius: '4px', bgcolor: '#f9f9f9' }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-              合計在庫数: {totalInventoryCount} 個
-            </Typography>
-            {Object.keys(inventoryByWeight).length > 1 && ( // 重さなし以外に複数の重さがある場合のみ表示
-              <Box sx={{ mt: 1 }}>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>重さ別合計:</Typography>
+            {Object.keys(inventoryByWeight).length > 1 ? (
+              <Box>
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>重さ別合計:</Typography>
                 {Object.entries(inventoryByWeight).map(([weight, count]) => (
                   <Typography variant="body2" key={weight} sx={{ ml: 1 }}>
                     {weight}: {count} 個
                   </Typography>
                 ))}
               </Box>
+            ) : (
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                合計在庫数: {totalInventoryCount} 個
+              </Typography>
             )}
           </Box>
         )}
